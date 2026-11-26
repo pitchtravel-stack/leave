@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<base target="_top">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ระบบบันทึกวันลา รพ.ร้องกวาง</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap">
+<style>
+:root{--blue:#1E7FD8;--blue-d:#145EA8;--blue-l:#E6F1FC;--blue-ll:#F2F8FE;--bg:#F3F5F8;--line:#E1E6ED;--line2:#EDF0F4;--text:#1E2A38;--muted:#667487;--muted2:#94A0B0;
+--sick:#3E8EDE;--biz:#E0A030;--vac:#2FA37A;--mat:#D2669A;--pat:#7B6FD6;--ord:#8C7A5B;--oth:#8A96A6;--danger:#D64545;--ok:#2F855A;--r:12px;--shadow:0 1px 2px rgba(20,40,70,.06),0 2px 8px rgba(20,40,70,.05)}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Sarabun',system-ui,sans-serif;font-size:15px;line-height:1.5}
+button,input,select,textarea{font:inherit;color:inherit}
+.hidden{display:none!important}
+.app{display:grid;grid-template-columns:232px 1fr;min-height:100vh}
+.side{background:#fff;border-right:1px solid var(--line);padding:18px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:4px}
+.brand{display:flex;gap:10px;align-items:center;padding:4px 8px 16px}
+.logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#2B8BE6,#145EA8);display:grid;place-items:center;color:#fff;font-weight:700;font-size:18px;flex:none}
+.brand b{display:block;font-size:15px;line-height:1.2}.brand small{color:var(--muted);font-size:12px}
+.nav{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;cursor:pointer;color:#3A4757;border:0;background:none;text-align:left;width:100%}
+.nav:hover{background:var(--blue-ll)}.nav.on{background:var(--blue-l);color:var(--blue-d);font-weight:600}
+.nav svg{width:19px;height:19px;flex:none}
+.sfoot{margin-top:auto;font-size:12px;color:var(--muted);padding:10px;background:var(--bg);border-radius:10px;line-height:1.7}
+.sfoot b{color:var(--text)}
+.main{min-width:0}
+.top{position:sticky;top:0;z-index:20;background:rgba(243,245,248,.94);backdrop-filter:blur(6px);border-bottom:1px solid var(--line);padding:10px 22px;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.top h1{font-size:19px;margin:0;font-weight:700;flex:1;min-width:150px}
+.ver{font-size:11px;background:#fff;border:1px solid var(--line);color:var(--muted);border-radius:20px;padding:1px 8px;margin-left:6px;font-weight:500;vertical-align:middle}
+.sel{background:#fff;border:1px solid var(--line);border-radius:9px;padding:6px 10px;height:36px}
+.user{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:20px;padding:3px 4px 3px 12px;font-size:13px;max-width:100%}
+.user .em{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rolebadge{border-radius:20px;padding:2px 10px;font-size:12px;font-weight:600}
+.rb-hr{background:var(--blue);color:#fff}.rb-view{background:var(--blue-l);color:var(--blue-d)}
+.content{padding:20px 22px 110px;max-width:1280px}
+.banner{border-radius:10px;padding:8px 12px;font-size:13.5px;margin-bottom:16px;background:var(--blue-l);border:1px solid #C9DFF6;color:var(--blue-d);display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grid{display:grid;gap:14px}.kpis{grid-template-columns:repeat(4,1fr)}
+.card{background:#fff;border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow)}
+.pad{padding:16px}
+.kpi .l{color:var(--muted);font-size:13px}.kpi .v{font-size:28px;font-weight:700;line-height:1.2;margin-top:2px}.kpi .s{font-size:12.5px;color:var(--muted2)}
+.kpi .v small{font-size:14px;color:var(--muted);font-weight:500}
+h2{font-size:16px;margin:0 0 12px;font-weight:700}h3{font-size:14.5px;margin:0 0 8px}
+.two{grid-template-columns:1.5fr 1fr}
+.muted{color:var(--muted)}.small{font-size:13px}
+.tools{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.search{flex:1;min-width:220px;position:relative}
+.search input{width:100%;height:42px;border:1px solid var(--line);border-radius:10px;padding:0 12px 0 38px;background:#fff;font-size:15px}
+.search svg{position:absolute;left:12px;top:12px;width:18px;height:18px;color:var(--muted2)}
+input:focus,select:focus,textarea:focus{outline:2px solid #B9D8F6;border-color:var(--blue)}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:#fff;border-radius:20px;padding:4px 12px;cursor:pointer;font-size:13.5px;color:#455366}
+.chip.on{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn{border:1px solid var(--line);background:#fff;border-radius:9px;padding:7px 14px;cursor:pointer;font-weight:500;display:inline-flex;gap:6px;align-items:center;justify-content:center}
+.btn:hover{background:var(--blue-ll)}.btn:disabled{opacity:.55;cursor:wait}
+.btn.pri{background:var(--blue);border-color:var(--blue);color:#fff}.btn.pri:hover{background:var(--blue-d)}
+.btn.dan{color:var(--danger)}.btn.sm{padding:3px 10px;font-size:13px}
+.tbl{width:100%;border-collapse:collapse;font-size:14px}
+.tbl th{text-align:left;font-weight:600;color:var(--muted);font-size:12.5px;padding:9px 10px;border-bottom:1px solid var(--line);background:#F8FAFC;position:sticky;top:0;z-index:1}
+.tbl td{padding:9px 10px;border-bottom:1px solid var(--line2);vertical-align:middle}
+.tbl tr.click{cursor:pointer}.tbl tr.click:hover td{background:var(--blue-ll)}
+.tbl .num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl .grp td{background:#F3F7FC;font-weight:600;color:var(--blue-d);font-size:13px}
+.scroll{overflow:auto;max-height:68vh;border-radius:var(--r)}
+.tag{display:inline-block;padding:1px 9px;border-radius:20px;font-size:12px;font-weight:600;white-space:nowrap}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px}
+.bar{height:6px;background:#EDF1F5;border-radius:6px;overflow:hidden;min-width:60px}.bar i{display:block;height:100%;border-radius:6px}
+.mini{display:flex;flex-direction:column;gap:3px;min-width:92px}.mini span{font-size:12.5px;color:var(--muted)}.mini b{color:var(--text);font-weight:600}
+.empty{padding:30px;text-align:center;color:var(--muted)}
+.chart{display:flex;gap:6px;align-items:flex-end;height:170px;padding-top:10px}
+.col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;min-width:0}
+.stack{width:70%;max-width:34px;display:flex;flex-direction:column-reverse;border-radius:5px 5px 0 0;overflow:hidden;background:#F0F3F7}
+.col small{font-size:11px;color:var(--muted)}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);margin-top:10px}
+.list .it{display:flex;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line2);cursor:pointer}.list .it:last-child{border:0}
+.av{width:34px;height:34px;border-radius:50%;background:var(--blue-l);color:var(--blue-d);display:grid;place-items:center;font-weight:700;flex:none;font-size:14px}
+.fab{position:fixed;right:24px;bottom:24px;z-index:30;background:var(--blue);color:#fff;border:0;border-radius:30px;padding:13px 20px;font-weight:600;box-shadow:0 6px 18px rgba(30,127,216,.35);cursor:pointer;display:flex;gap:8px;align-items:center;font-size:15px}
+.ov{position:fixed;inset:0;background:rgba(20,32,48,.38);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:16px;width:min(640px,100%);max-height:92vh;overflow:auto;box-shadow:0 20px 50px rgba(0,0,0,.2)}
+.mh{display:flex;justify-content:space-between;align-items:center;padding:16px 20px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#fff;z-index:2;gap:10px}
+.mh h2{margin:0}
+.x{border:0;background:var(--bg);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:18px;flex:none}
+.mb{padding:18px 20px}
+.mf{padding:14px 20px;border-top:1px solid var(--line);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:#fff}
+.drawer{position:fixed;right:0;top:0;bottom:0;width:min(520px,100%);background:#fff;z-index:51;overflow:auto;box-shadow:-10px 0 30px rgba(0,0,0,.12)}
+.f{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.f label{font-size:13.5px;font-weight:600;color:#3A4757}
+.f input,.f select,.f textarea{border:1px solid var(--line);border-radius:9px;padding:8px 11px;background:#fff;width:100%}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.typegrid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.tbtn{border:1.5px solid var(--line);background:#fff;border-radius:10px;padding:8px 4px;cursor:pointer;font-size:13.5px;text-align:center}
+.tbtn.on{border-color:var(--blue);background:var(--blue-l);color:var(--blue-d);font-weight:600}
+.combo{position:relative}
+.opts{position:absolute;left:0;right:0;top:100%;margin-top:4px;background:#fff;border:1px solid var(--line);border-radius:10px;max-height:240px;overflow:auto;z-index:5;box-shadow:var(--shadow)}
+.opts div{padding:8px 12px;cursor:pointer;font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.opts div:hover,.opts div.hl{background:var(--blue-ll)}
+.qbox{background:var(--blue-ll);border:1px solid #D3E6F8;border-radius:12px;padding:12px 14px;margin-bottom:14px}
+.qbox .nums{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}
+.qbox .nums b{display:block;font-size:20px}.qbox .nums span{font-size:12px;color:var(--muted)}
+.alert{border-radius:9px;padding:8px 12px;font-size:13.5px;margin-top:8px}
+.alert.w{background:#FFF6E5;color:#8A5A0B;border:1px solid #F3DCAA}
+.alert.e{background:#FDECEC;color:#9B2C2C;border:1px solid #F5C2C2}
+.alert.i{background:#EAF5EF;color:#276749;border:1px solid #BFE3CD}
+.toast{position:fixed;left:50%;bottom:90px;transform:translateX(-50%);background:#1E2A38;color:#fff;padding:10px 18px;border-radius:10px;z-index:80;font-size:14px;box-shadow:0 8px 20px rgba(0,0,0,.2);max-width:90vw;text-align:center}
+.toast.err{background:var(--danger)}
+.qt input{width:62px;padding:4px 6px;border:1px solid var(--line);border-radius:7px;text-align:right}
+.qt input:disabled{background:transparent;border-color:transparent;color:var(--text)}
+.bnav{display:none}.cards-m{display:none}
+.mcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:9px;cursor:pointer}
+.mcard .h{display:flex;justify-content:space-between;gap:8px;align-items:center;margin-bottom:8px}
+.mcard .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+/* login */
+.login{min-height:100vh;display:grid;place-items:center;padding:20px;background:linear-gradient(160deg,#EAF3FD 0%,#F3F5F8 55%)}
+.lbox{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 10px 30px rgba(20,60,110,.08);width:min(400px,100%);padding:28px 26px}
+.lbox .logo{width:52px;height:52px;font-size:24px;border-radius:14px;margin-bottom:12px}
+.lbox h1{font-size:20px;margin:0}.lbox p{color:var(--muted);font-size:14px;margin:6px 0 18px}
+.lbox input{width:100%;height:46px;border:1px solid var(--line);border-radius:10px;padding:0 14px;font-size:16px;margin-bottom:12px}
+.lbox .btn{width:100%;height:46px;font-size:16px}
+.otp{letter-spacing:10px;text-align:center;font-size:24px!important;font-weight:700}
+.lerr{color:var(--danger);font-size:14px;min-height:20px;margin-bottom:6px}
+.lfoot{text-align:center;color:var(--muted2);font-size:12px;margin-top:16px}
+.link{color:var(--blue-d);cursor:pointer;background:none;border:0;padding:0;font-size:14px;text-decoration:underline}
+.loading{position:fixed;inset:0;background:rgba(243,245,248,.75);z-index:90;display:grid;place-items:center}
+.spin{width:38px;height:38px;border:4px solid var(--blue-l);border-top-color:var(--blue);border-radius:50%;animation:sp 0.8s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.vchart{display:flex;gap:3px;align-items:flex-end;height:110px}
+.vchart i{flex:1;background:var(--blue);border-radius:3px 3px 0 0;min-height:2px;opacity:.85}
+@media (max-width:1100px){.kpis{grid-template-columns:repeat(2,1fr)}.two{grid-template-columns:1fr}}
+@media (max-width:860px){
+  .app{grid-template-columns:1fr}.side{display:none}
+  .top{padding:10px 14px}.top h1{font-size:17px}.user .em{max-width:120px}
+  .content{padding:14px 14px 120px}
+  .bnav{display:flex;position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);z-index:40;padding:4px 4px calc(4px + env(safe-area-inset-bottom))}
+  .bnav button{flex:1;border:0;background:none;display:flex;flex-direction:column;align-items:center;font-size:11px;color:var(--muted);padding:5px 0;cursor:pointer}
+  .bnav button.on{color:var(--blue-d);font-weight:600}.bnav svg{width:22px;height:22px}
+  .fab{bottom:78px;right:16px;padding:12px 16px}
+  .hide-m{display:none!important}.cards-m{display:block}
+  .typegrid{grid-template-columns:repeat(2,1fr)}
+  .ov{padding:0;align-items:flex-end}.modal{border-radius:16px 16px 0 0;max-height:94vh}
+  .row2{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<!-- LOGIN -->
+<div class="login hidden" id="login">
+  <div class="lbox">
+    <div class="logo">ล</div>
+    <h1>ระบบบันทึกวันลา</h1>
+    <p>โรงพยาบาลร้องกวาง จังหวัดแพร่</p>
+    <div id="lstep"></div>
+    <div class="lfoot" id="lfoot"></div>
+  </div>
+</div>
+<!-- APP -->
+<div class="app hidden" id="app">
+  <aside class="side">
+    <div class="brand"><div class="logo">ล</div><div><b>ระบบบันทึกวันลา</b><small>โรงพยาบาลร้องกวาง</small></div></div>
+    <div id="sidenav"></div>
+    <div class="sfoot" id="sfoot"></div>
+  </aside>
+  <div class="main">
+    <header class="top">
+      <h1 id="ttl"></h1>
+      <select class="sel" id="fy" aria-label="ปีงบประมาณ"></select>
+      <div class="user" id="user"></div>
+    </header>
+    <div class="content" id="view"></div>
+  </div>
+</div>
+<nav class="bnav hidden" id="bnav"></nav>
+<button class="fab hidden" id="fab"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>บันทึกการลา</button>
+<div id="layer"></div>
+<div class="loading hidden" id="loading"><div class="spin"></div></div>
+
+<script>
+const VERSION='1.4.0';
+/* ⚙️ ใส่ URL ของ web app (ลงท้าย /exec) จาก Deploy > Manage deployments */
+const API_URL='https://script.google.com/macros/s/AKfycbzveIFGQBSJZOOLpbqDo73utbT-GEmWZioqVbMg9smdyWQTPAwDR4wCnfQULpA_8zSz0A/exec';
+document.getElementById('lfoot').textContent='เวอร์ชัน '+VERSION;
+/* ===================== constants ===================== */
+const GROUPS={gov:'ข้าราชการ',perm:'ลูกจ้างประจำ',moph:'พกส./พนักงานราชการ',temp:'ลูกจ้างชั่วคราว'};
+const TYPES=[{k:'sick',n:'ลาป่วย',c:'var(--sick)',unit:'work'},{k:'biz',n:'ลากิจส่วนตัว',c:'var(--biz)',unit:'work'},{k:'vac',n:'ลาพักผ่อน',c:'var(--vac)',unit:'work'},{k:'mat',n:'ลาคลอดบุตร',c:'var(--mat)',unit:'cal'},{k:'pat',n:'ลาช่วยภริยาคลอด',c:'var(--pat)',unit:'work'},{k:'ord',n:'ลาอุปสมบท/ฮัจย์',c:'var(--ord)',unit:'cal'},{k:'oth',n:'ลาอื่น ๆ',c:'var(--oth)',unit:'work'}];
+const T=Object.fromEntries(TYPES.map(t=>[t.k,t]));
+const STATUS={active:'ปฏิบัติงาน',retired:'เกษียณ',resigned:'ลาออก/พ้นสภาพ'};
+const LS={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
+const DEVICE=/iPad|Macintosh.*Mobile|Tablet/i.test(navigator.userAgent)||(/Macintosh/.test(navigator.userAgent)&&navigator.maxTouchPoints>1)?'iPad/Tablet':/Mobi|Android|iPhone/i.test(navigator.userAgent)?'มือถือ':'PC';
+
+/* ===================== state ===================== */
+const S={view:'dash',fy:null,q:'',grp:'all',hq:'',ht:'all',hm:'all',mm:null,showAll:false,sort:'name',lq:''};
+let D=null, USER=null, STATS=null, TOKEN=null, SBY={}, _u=null, ADMIN=null, LOGS=null;
+
+/* ===================== helpers ===================== */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>(n==null||isNaN(n)?'–':(Math.round(n*10)/10).toLocaleString('th-TH'));
+const d2=iso=>new Date(iso+'T00:00:00');
+const thd=iso=>iso?d2(iso).toLocaleDateString('th-TH',{day:'numeric',month:'short',year:'2-digit'}):'–';
+const ymd=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+const fyOf=iso=>{const d=d2(iso);return String(d.getFullYear()+543+(d.getMonth()>=9?1:0));};
+const fyMonths=fy=>{const y=+fy-544,a=[];for(let i=0;i<12;i++){const m=(9+i)%12,yy=y+(9+i>=12?1:0);a.push(yy+'-'+String(m+1).padStart(2,'0'));}return a;};
+const mName=k=>{const[y,m]=k.split('-');return new Date(+y,+m-1,1).toLocaleDateString('th-TH',{month:'short'});};
+const mLong=k=>{const[y,m]=k.split('-');return new Date(+y,+m-1,1).toLocaleDateString('th-TH',{month:'long',year:'numeric'});};
+const today=ymd(new Date());
+const initials=n=>String(n).replace(/^(นางสาว|น\.ส\.|นาง|นาย|ดร\.|นพ\.|พญ\.)\s*/,'').trim().charAt(0);
+const plain=n=>String(n).replace(/^(นางสาว|น\.ส\.|นาง|นาย)\s*/,'');
+const isHR=()=>USER&&USER.role==='hr';
+const active=s=>!/retired|resigned|เกษียณ|ลาออก/i.test(s.status||'');
+const tag=k=>`<span class="tag" style="background:color-mix(in srgb, ${T[k].c} 15%, white);color:color-mix(in srgb, ${T[k].c} 80%, black)">${T[k].n}</span>`;
+function toast(t,err){const e=document.createElement('div');e.className='toast'+(err?' err':'');e.textContent=t;document.body.appendChild(e);setTimeout(()=>e.remove(),err?4000:2300);}
+function busy(on){$('#loading').classList.toggle('hidden',!on);}
+
+/* ===================== server call ===================== */
+/* เปิดจาก Apps Script → ใช้ google.script.run | เปิดจาก server ภายนอก → fetch JSON API (ไม่ผูกบัญชี Google ในเบราว์เซอร์) */
+const VIA_GAS=typeof google!=='undefined'&&!!(google.script&&google.script.run);
+function callServer(fn,args){
+  if(VIA_GAS)return new Promise((res,rej)=>google.script.run.withSuccessHandler(res).withFailureHandler(e=>rej(new Error(e&&e.message||'เชื่อมต่อไม่สำเร็จ')))[fn](...args));
+  return fetch(API_URL,{method:'POST',credentials:'omit',redirect:'follow',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({fn,args})})
+    .catch(()=>{throw new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ตแล้วลองใหม่')})
+    .then(r=>{if(!r.ok)throw new Error('เซิร์ฟเวอร์ตอบกลับผิดพลาด ('+r.status+')');return r.text()})
+    .then(t=>{try{return JSON.parse(t)}catch(e){throw new Error('ระบบตอบกลับไม่ถูกต้อง — ตรวจสอบ API_URL และการ Deploy (Anyone)')}});
+}
+function api(fn,...args){
+  return callServer(fn,args).then(r=>{
+    if(r&&r.ok===false){
+      if(r.error==='AUTH'){logout(true);throw new Error('กรุณาเข้าสู่ระบบใหม่');}
+      throw new Error(r.error);
+    }
+    return r;
+  });
+}
+async function run(fn,...args){busy(true);try{return await api(fn,...args);}catch(e){toast(e.message,true);throw e;}finally{busy(false);}}
+
+/* ===================== business rules ===================== */
+function workDays(a,b,unit){
+  if(!a||!b||b<a)return 0;const hol=new Set(D.holidays.map(h=>h[0]));let n=0;
+  for(let d=d2(a);ymd(d)<=b;d.setDate(d.getDate()+1)){if(unit==='cal'){n++;continue}const w=d.getDay();if(w===0||w===6||hol.has(ymd(d)))continue;n++;}
+  return n;
+}
+const firstYear=(s,fy)=>!!s.start&&s.start>((+fy-545)+'-10-01');
+function qcfg(s,type){return (D.quota[s.group]||{})[type]||null;}
+function quota(s,type,fy){
+  const q=qcfg(s,type);
+  if(type==='vac'){const v=D.vac[s.id];return v!=null?v:(q?q.days:null);}
+  if(!q||q.days==null)return null;
+  if(q.first!=null&&firstYear(s,fy))return q.first;
+  return q.days;
+}
+function monthsServed(s,at){if(!s.start)return 999;const a=d2(s.start),b=d2(at);return(b.getFullYear()-a.getFullYear())*12+(b.getMonth()-a.getMonth())-(b.getDate()<a.getDate()?1:0);}
+function usage(sid,excl){const u={};TYPES.forEach(t=>u[t.k]=0);D.leaves.forEach(r=>{if(r.sid===sid&&r.id!==excl)u[r.type]+=r.days});return u;}
+function allUsage(){if(_u)return _u;const m={};D.staff.forEach(s=>{m[s.id]={};TYPES.forEach(t=>m[s.id][t.k]=0)});D.leaves.forEach(r=>{if(m[r.sid])m[r.sid][r.type]+=r.days});return _u=m;}
+function setData(d){D=d;S.fy=d.fy;SBY=Object.fromEntries(d.staff.map(s=>[s.id,s]));_u=null;
+  $('#fy').innerHTML=d.fyList.map(f=>`<option value="${f}" ${f===d.fy?'selected':''}>ปีงบประมาณ ${f}</option>`).join('');}
+
+/* ===================== auth flow ===================== */
+function showLogin(step,ctx={}){
+  $('#app').classList.add('hidden');$('#bnav').classList.add('hidden');$('#fab').classList.add('hidden');$('#login').classList.remove('hidden');
+  const L=$('#lstep');
+  if(step==='email'){
+    L.innerHTML=`<label class="small muted">อีเมล Gmail ที่ลงทะเบียนกับงานการเจ้าหน้าที่</label><input id="le" type="email" inputmode="email" autocomplete="email" placeholder="name@gmail.com" value="${esc(LS.get('lv_email')||'')}"><div class="lerr" id="lerr"></div><button class="btn pri" id="lgo">ขอรหัสเข้าใช้ทาง Gmail</button>
+    <p class="small" style="margin-top:14px">ระบบจะส่งรหัส 6 หลักไปที่ Gmail ของท่าน · เจ้าหน้าที่ดูข้อมูลได้อย่างเดียว · HR ต้องใส่ PIN เพิ่ม</p>`;
+    const go=async()=>{if($('#lgo').disabled)return;const em=$('#le').value.trim().toLowerCase();if(!em){$('#lerr').textContent='กรุณากรอกอีเมล';return}
+      $('#lgo').disabled=true;$('#lerr').textContent='';
+      try{await api('apiRequestOtp',em);LS.set('lv_email',em);showLogin('otp',{email:em});}catch(e){$('#lerr').textContent=e.message;$('#lgo').disabled=false;}};
+    $('#lgo').onclick=go;$('#le').onkeydown=e=>{if(e.key==='Enter')go()};setTimeout(()=>{const e=$('#le');if(e)e.focus()},50);
+  }
+  if(step==='otp'){
+    L.innerHTML=`<div class="small" style="margin-bottom:8px">ส่งรหัสไปที่ <b>${esc(ctx.email)}</b> แล้ว (ใช้ได้ 10 นาที)</div><input id="lo" class="otp" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="••••••"><div class="lerr" id="lerr"></div><button class="btn pri" id="lgo">ยืนยันรหัส</button>
+    <div style="display:flex;justify-content:space-between;margin-top:14px"><button class="link" id="lback">เปลี่ยนอีเมล</button><button class="link" id="lre">ส่งรหัสอีกครั้ง</button></div>`;
+    const go=async()=>{if($('#lgo').disabled)return;const c=$('#lo').value.trim();if(c.length!==6){$('#lerr').textContent='กรอกรหัส 6 หลัก';return}
+      $('#lgo').disabled=true;$('#lerr').textContent='';
+      try{const r=await api('apiVerifyOtp',ctx.email,c,DEVICE);LS.set('lv_view',r.viewToken);
+        if(r.isHr)showLogin('pin',{pinToken:r.pinToken,hasPin:r.hasPin,email:ctx.email});else start(r.viewToken);
+      }catch(e){$('#lerr').textContent=e.message;$('#lgo').disabled=false;}};
+    $('#lgo').onclick=go;$('#lo').oninput=e=>{e.target.value=e.target.value.replace(/\D/g,'');if(e.target.value.length===6)go();};
+    $('#lback').onclick=()=>showLogin('email');
+    $('#lre').onclick=async()=>{try{await api('apiRequestOtp',ctx.email);toast('ส่งรหัสใหม่แล้ว')}catch(e){$('#lerr').textContent=e.message}};
+    setTimeout(()=>{const e=$('#lo');if(e)e.focus()},50);
+  }
+  if(step==='pin'){
+    const first=!ctx.hasPin;
+    L.innerHTML=`<div class="small" style="margin-bottom:8px">บัญชี HR: <b>${esc(ctx.email)}</b><br>${first?'ตั้ง PIN ตัวเลข 6 หลักสำหรับใช้ครั้งต่อไป':'ใส่ PIN 6 หลัก เพื่อเข้าโหมดบันทึก/แก้ไข'}</div>
+    <input id="lp" class="otp" type="password" inputmode="numeric" maxlength="6" placeholder="PIN">${first?'<input id="lp2" class="otp" type="password" inputmode="numeric" maxlength="6" placeholder="ยืนยัน PIN">':''}
+    <div class="lerr" id="lerr"></div><button class="btn pri" id="lgo">${first?'ตั้ง PIN และเข้าสู่ระบบ':'เข้าสู่โหมด HR'}</button>
+    <div style="text-align:center;margin-top:14px"><button class="link" id="lview">เข้าแบบดูอย่างเดียว</button></div>`;
+    const go=async()=>{if($('#lgo').disabled)return;const p=$('#lp').value;if(!/^\d{6}$/.test(p)){$('#lerr').textContent='PIN ต้องเป็นตัวเลข 6 หลัก';return}
+      if(first&&p!==$('#lp2').value){$('#lerr').textContent='PIN ทั้งสองช่องไม่ตรงกัน';return}
+      $('#lgo').disabled=true;$('#lerr').textContent='';
+      try{const r=await api(first?'apiSetFirstPin':'apiVerifyPin',ctx.pinToken,p,DEVICE);LS.set('lv_hr',r.hrToken);start(r.hrToken);}
+      catch(e){$('#lerr').textContent=e.message;$('#lgo').disabled=false;$('#lp').value='';}};
+    $('#lgo').onclick=go;L.querySelectorAll('input').forEach(i=>{i.oninput=()=>{i.value=i.value.replace(/\D/g,'')};i.onkeydown=e=>{if(e.key==='Enter')go()}});
+    if(!first)$('#lp').oninput=e=>{e.target.value=e.target.value.replace(/\D/g,'');if(e.target.value.length===6)go();};
+    $('#lview').onclick=()=>{try{sessionStorage.setItem('lv_vo','1')}catch(e){}start(LS.get('lv_view'))};
+    setTimeout(()=>{const e=$('#lp');if(e)e.focus()},50);
+  }
+}
+async function enterHr(){
+  try{const r=await run('apiPinFromView',LS.get('lv_view'));closeLayer();showLogin('pin',{pinToken:r.pinToken,hasPin:r.hasPin,email:USER.email});}catch(e){}
+}
+function leaveHr(){try{sessionStorage.setItem('lv_vo','1')}catch(e){}LS.del('lv_hr');start(LS.get('lv_view'));}
+function logout(silent){LS.del('lv_hr');LS.del('lv_view');USER=null;D=null;closeLayer();showLogin('email');if(!silent)toast('ออกจากระบบแล้ว');}
+async function start(tok){
+  if(!tok){showLogin('email');return}
+  TOKEN=tok;busy(true);
+  try{
+    const r=await api('apiBootstrap',tok,S.fy||'',DEVICE);
+    USER=r.user;STATS=r.stats;setData(r.data);
+    $('#login').classList.add('hidden');$('#app').classList.remove('hidden');$('#bnav').classList.remove('hidden');
+    render();
+    let vo=null;try{vo=sessionStorage.getItem('lv_vo')}catch(e){}
+    if(USER.isHrAccount&&USER.role!=='hr'&&!vo){busy(false);enterHr();}
+  }catch(e){
+    if(tok===LS.get('lv_hr')){LS.del('lv_hr');const v=LS.get('lv_view');if(v){busy(false);return start(v)}}
+    showLogin('email');if(!/เข้าสู่ระบบใหม่/.test(e.message))toast(e.message,true);
+  }finally{busy(false);}
+}
+
+/* ===================== nav ===================== */
+const IC={dash:'<path d="M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-4H4zM14 4v4h6V4z"/>',staff:'<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c.8-3.5 3.4-5.5 6.5-5.5s5.7 2 6.5 5.5"/><path d="M16 4.5a3.5 3.5 0 0 1 0 7M18 14.6c1.8.8 3 2.6 3.5 5.4"/>',hist:'<rect x="4" y="4" width="16" height="17" rx="2"/><path d="M8 2.5v3M16 2.5v3M4 9.5h16M8 13.5h3M8 17h6"/>',month:'<path d="M4 5h16M4 10h16M4 15h10M4 20h7"/>',log:'<path d="M3 12h4l3 8 4-16 3 8h4"/>',set:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/>',search:'<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>'};
+const ico=k=>`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;
+function views(){const v=[['dash','ภาพรวม','ภาพรวม'],['staff','รายชื่อ & สิทธิ์คงเหลือ','รายชื่อ'],['hist','ประวัติการลา','ประวัติ'],['month','สรุปรายเดือน','สรุปเดือน']];
+  if(isHR())v.push(['log','Log การใช้งาน','Log']);v.push(['set',isHR()?'ตั้งค่า / สำรองข้อมูล':'ระเบียบการลา',isHR()?'ตั้งค่า':'ระเบียบ']);return v;}
+function renderNav(){
+  const V=views();if(!V.some(v=>v[0]===S.view))S.view='dash';
+  $('#sidenav').innerHTML=V.map(([k,n])=>`<button class="nav ${S.view===k?'on':''}" data-v="${k}">${ico(k)}${n}</button>`).join('');
+  $('#bnav').innerHTML=V.map(([k,,sn])=>`<button class="${S.view===k?'on':''}" data-v="${k}">${ico(k)}${sn}</button>`).join('');
+  document.querySelectorAll('[data-v]').forEach(b=>b.onclick=()=>go(b.dataset.v));
+  $('#ttl').innerHTML=esc(V.find(v=>v[0]===S.view)[1])+`<span class="ver">v${VERSION}</span>`;
+  $('#fab').classList.toggle('hidden',!isHR());
+  $('#user').innerHTML=`<span class="em" title="${esc(USER.email)}">${esc(USER.email)}</span><span class="rolebadge ${isHR()?'rb-hr':'rb-view'}">${isHR()?(USER.hrRole==='ADMIN'?'ADMIN':'HR'):'ดูอย่างเดียว'}</span><button class="btn sm" id="umenu" style="border-radius:20px">⋯</button>`;
+  $('#umenu').onclick=userMenu;
+  const st=STATS||{};
+  $('#sfoot').innerHTML=`👁 ผู้เข้าชม<br>วันนี้ <b>${(st.today||0).toLocaleString()}</b> ครั้ง · <b>${st.todayUsers||0}</b> คน<br>เดือนนี้ <b>${(st.month||0).toLocaleString()}</b> ครั้ง · <b>${st.monthUsers||0}</b> คน<br>ทั้งหมด <b>${(st.total||0).toLocaleString()}</b> ครั้ง<div style="margin-top:6px;color:var(--muted2)">v${VERSION}</div>`;
+}
+function userMenu(){
+  modal('บัญชีผู้ใช้',`<div class="small muted">เข้าสู่ระบบด้วย</div><div style="font-weight:600;margin-bottom:4px">${esc(USER.email)}</div><div class="small muted" style="margin-bottom:16px">${esc(USER.name)} · ${isHR()?'โหมด HR (บันทึก/แก้ไขได้)':'โหมดดูอย่างเดียว'}</div>
+   <div style="display:grid;gap:8px">
+   ${USER.isHrAccount&&!isHR()?'<button class="btn pri" id="m_hr">🔐 เข้าโหมด HR (ใส่ PIN)</button>':''}
+   ${isHR()?'<button class="btn" id="m_pin">เปลี่ยน PIN</button><button class="btn" id="m_vw">กลับเป็นโหมดดูอย่างเดียว</button>':''}
+   <button class="btn dan" id="m_out">ออกจากระบบ</button></div><div class="small muted" style="margin-top:14px;text-align:center">เวอร์ชัน ${VERSION} · ${DEVICE}</div>`);
+  const b=(id,f)=>{const e=$(id);if(e)e.onclick=f};
+  b('#m_hr',enterHr);b('#m_vw',()=>{closeLayer();leaveHr()});b('#m_out',()=>logout());b('#m_pin',changePin);
+}
+function changePin(){
+  modal('เปลี่ยน PIN',`<div class="f"><label>PIN เดิม</label><input id="p0" type="password" inputmode="numeric" maxlength="6"></div><div class="f"><label>PIN ใหม่ (ตัวเลข 6 หลัก)</label><input id="p1" type="password" inputmode="numeric" maxlength="6"></div><div class="f"><label>ยืนยัน PIN ใหม่</label><input id="p2" type="password" inputmode="numeric" maxlength="6"></div>`,
+   `<button class="btn" id="pc">ยกเลิก</button><button class="btn pri" id="ps">บันทึก</button>`);
+  $('#pc').onclick=closeLayer;
+  $('#ps').onclick=async()=>{const a=$('#p0').value,b=$('#p1').value,c=$('#p2').value;if(!/^\d{6}$/.test(b)){toast('PIN ใหม่ต้องเป็นตัวเลข 6 หลัก',true);return}if(b!==c){toast('PIN ใหม่ไม่ตรงกัน',true);return}
+    try{await run('apiChangePin',TOKEN,a,b);closeLayer();toast('เปลี่ยน PIN แล้ว');}catch(e){}};
+}
+function go(v){S.view=v;render();window.scrollTo(0,0);}
+
+/* ===================== views ===================== */
+function bannerHTML(){
+  return isHR()?'':`<div class="banner">👁️ โหมดดูอย่างเดียว · ปีงบประมาณ ${S.fy} — หากข้อมูลไม่ถูกต้องโปรดติดต่องานการเจ้าหน้าที่${USER.isHrAccount?' <button class="btn sm" id="bnHr">เข้าโหมด HR</button>':''}</div>`;
+}
+function myCard(){
+  const s=SBY[USER.staffId];if(!s)return '';const u=usage(s.id);
+  return `<div class="card pad" style="margin-bottom:14px;border-color:#C9DFF6;background:linear-gradient(180deg,#F2F8FE,#fff)"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><div><div class="small muted">สิทธิ์การลาของฉัน · ปีงบ ${S.fy}</div><b style="font-size:16px">${esc(s.name)}</b></div><button class="btn sm" data-sid="${s.id}">ดูประวัติของฉัน</button></div>
+   <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-top:10px">${['vac','sick','biz'].map(k=>{const q=quota(s,k,S.fy);return `<div><div class="small muted">${T[k].n}</div><b style="font-size:20px">${q!=null?fmt(q-u[k]):'–'}</b> <span class="small muted">คงเหลือ${q!=null?' จาก '+fmt(q):''}</span></div>`}).join('')}</div></div>`;
+}
+function vDash(){
+  const U=allUsage(),act=D.staff.filter(active),recs=D.leaves,tot=recs.reduce((a,r)=>a+r.days,0);
+  const onLeave=recs.filter(r=>r.start<=today&&r.end>=today);
+  const months=fyMonths(S.fy);
+  const byM=months.map(m=>{const o={};TYPES.forEach(t=>o[t.k]=0);recs.forEach(r=>{if(r.start.slice(0,7)===m)o[r.type]+=r.days});return o});
+  const maxM=Math.max(1,...byM.map(o=>Object.values(o).reduce((a,b)=>a+b,0)));
+  const byT=TYPES.map(t=>({t,v:recs.filter(r=>r.type===t.k).reduce((a,r)=>a+r.days,0)})).filter(x=>x.v>0);
+  const risk=[];act.forEach(s=>['sick','biz'].forEach(k=>{const q=quota(s,k,S.fy),u=U[s.id][k];if(q&&u>=q*0.7)risk.push({s,k,u,q,p:u/q})}));risk.sort((a,b)=>b.p-a.p);
+  const recent=[...recs].sort((a,b)=>(b.at||'').localeCompare(a.at||'')||b.start.localeCompare(a.start)).slice(0,6);
+  const st=STATS||{};
+  return bannerHTML()+myCard()+`
+  <div class="grid kpis">
+   <div class="card pad kpi"><div class="l">เจ้าหน้าที่ปฏิบัติงาน</div><div class="v">${act.length} <small>คน</small></div><div class="s">${Object.entries(GROUPS).map(([k,n])=>n.split('/')[0]+' '+act.filter(s=>s.group===k).length).join(' · ')}</div></div>
+   <div class="card pad kpi"><div class="l">การลา ปีงบ ${S.fy}</div><div class="v">${recs.length.toLocaleString()} <small>ครั้ง</small></div><div class="s">รวม ${fmt(tot)} วัน · ${new Set(recs.map(r=>r.sid)).size} คน</div></div>
+   <div class="card pad kpi"><div class="l">ลาวันนี้ (${thd(today)})</div><div class="v">${onLeave.length} <small>คน</small></div><div class="s">${onLeave.slice(0,3).map(r=>esc(plain((SBY[r.sid]||{}).name||''))).join(', ')||'—'}</div></div>
+   <div class="card pad kpi"><div class="l">👁 ผู้เข้าชมวันนี้</div><div class="v">${(st.today||0).toLocaleString()} <small>ครั้ง · ${st.todayUsers||0} คน</small></div><div class="s">เดือนนี้ ${(st.month||0).toLocaleString()} ครั้ง · ทั้งหมด ${(st.total||0).toLocaleString()} ครั้ง</div></div>
+  </div>
+  <div class="grid two" style="margin-top:14px">
+   <div class="card pad"><h2>วันลารายเดือน ปีงบประมาณ ${S.fy}</h2>
+    <div class="chart">${byM.map((o,i)=>{const sum=Object.values(o).reduce((a,b)=>a+b,0);return `<div class="col" title="${mLong(months[i])}: ${fmt(sum)} วัน"><small>${sum?fmt(sum):''}</small><div class="stack" style="height:${sum/maxM*130+2}px">${TYPES.map(t=>o[t.k]?`<i style="height:${o[t.k]/sum*100}%;background:${t.c}"></i>`:'').join('')}</div><small>${mName(months[i])}</small></div>`}).join('')}</div>
+    <div class="legend">${TYPES.slice(0,5).map(t=>`<span><span class="dot" style="background:${t.c}"></span>${t.n}</span>`).join('')}</div></div>
+   <div class="card pad"><h2>สัดส่วนตามประเภทการลา</h2>${byT.length?byT.map(x=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:14px"><span><span class="dot" style="background:${x.t.c}"></span>${x.t.n}</span><b>${fmt(x.v)} วัน</b></div><div class="bar" style="margin-top:4px"><i style="width:${x.v/tot*100}%;background:${x.t.c}"></i></div></div>`).join(''):'<div class="empty">ยังไม่มีข้อมูลการลาในปีงบนี้</div>'}</div>
+  </div>
+  <div class="grid two" style="margin-top:14px">
+   <div class="card pad"><h2>บันทึกล่าสุด</h2><div class="list">${recent.map(r=>{const s=SBY[r.sid]||{name:r.sid};return `<div class="it" data-sid="${r.sid}"><div class="av">${esc(initials(s.name))}</div><div style="flex:1;min-width:0"><b>${esc(s.name)}</b><div class="small muted">${thd(r.start)}${r.end!==r.start?' – '+thd(r.end):''} · ${fmt(r.days)} วัน</div></div>${tag(r.type)}</div>`}).join('')||'<div class="empty">—</div>'}</div></div>
+   <div class="card pad"><h2>ใช้สิทธิ์ลาป่วย/ลากิจ ≥ 70%</h2><div class="list">${risk.slice(0,6).map(x=>`<div class="it" data-sid="${x.s.id}"><div class="av">${esc(initials(x.s.name))}</div><div style="flex:1;min-width:0"><b>${esc(x.s.name)}</b><div class="bar" style="margin-top:5px"><i style="width:${Math.min(100,x.p*100)}%;background:${x.p>=1?'var(--danger)':T[x.k].c}"></i></div></div><div class="small" style="text-align:right">${T[x.k].n}<br><b>${fmt(x.u)}/${x.q}</b></div></div>`).join('')||'<div class="empty">ไม่มีผู้ที่ใช้สิทธิ์ใกล้ครบ</div>'}</div></div>
+  </div>`;
+}
+function vStaff(){
+  const chips=[['all','ทั้งหมด'],...Object.entries(GROUPS),['inactive','เกษียณ/พ้นสภาพ']].map(([k,n])=>`<button class="chip ${S.grp===k?'on':''}" data-g="${k}">${n}</button>`).join('');
+  return bannerHTML()+`<div class="tools"><div class="search">${ico('search')}<input id="q" placeholder="ค้นหาชื่อ-สกุล / รหัส / หน่วยงาน…" value="${esc(S.q)}" autocomplete="off"></div>
+   <select class="sel" id="sort"><option value="name">เรียงตามรหัส</option><option value="vac">พักผ่อนคงเหลือ น้อย→มาก</option><option value="sick">ลาป่วย มาก→น้อย</option><option value="total">ลารวม มาก→น้อย</option></select>
+   ${isHR()?'<button class="btn pri" id="addStaff">+ เพิ่มเจ้าหน้าที่</button>':''}</div><div class="chips" style="margin-bottom:14px">${chips}</div><div id="slist"></div>`;
+}
+function renderStaffList(){
+  const U=allUsage(),q=S.q.trim().toLowerCase(),fy=S.fy;
+  let L=D.staff.filter(s=>(S.grp==='inactive'?!active(s):active(s)&&(S.grp==='all'||s.group===S.grp))&&(!q||(s.name+' '+s.id+' '+s.dept+' '+s.position).toLowerCase().includes(q)));
+  const tot=s=>Object.values(U[s.id]).reduce((a,b)=>a+b,0);
+  if(S.sort==='vac')L=[...L].sort((a,b)=>((quota(a,'vac',fy)||0)-U[a.id].vac)-((quota(b,'vac',fy)||0)-U[b.id].vac));
+  if(S.sort==='sick')L=[...L].sort((a,b)=>U[b.id].sick-U[a.id].sick);
+  if(S.sort==='total')L=[...L].sort((a,b)=>tot(b)-tot(a));
+  const cell=(s,k)=>{const qq=quota(s,k,fy),u=U[s.id][k];
+    if(k==='vac'){const rem=(qq||0)-u;return `<div class="mini"><span>คงเหลือ <b style="color:${rem<=0?'var(--danger)':'var(--ok)'}">${fmt(rem)}</b> / ${fmt(qq)}</span><div class="bar"><i style="width:${qq?Math.min(100,u/qq*100):0}%;background:${T.vac.c}"></i></div></div>`}
+    if(qq==null)return `<div class="mini"><span><b>${fmt(u)}</b> วัน</span><span style="font-size:11px">${k==='biz'&&s.group==='temp'?'หักค่าจ้าง':'ไม่กำหนด'}</span></div>`;
+    return `<div class="mini"><span><b>${fmt(u)}</b> / ${qq}</span><div class="bar"><i style="width:${Math.min(100,u/qq*100)}%;background:${u>qq?'var(--danger)':T[k].c}"></i></div></div>`};
+  const head=`<div class="small muted" style="margin-bottom:8px">พบ ${L.length} คน · ปีงบประมาณ ${fy} (1 ต.ค. ${+fy-1} – 30 ก.ย. ${fy})</div>`;
+  if(!L.length){$('#slist').innerHTML=head+'<div class="card empty">ไม่พบรายชื่อที่ค้นหา</div>';return}
+  $('#slist').innerHTML=head+`<div class="card hide-m"><div class="scroll"><table class="tbl"><thead><tr><th>รหัส</th><th>ชื่อ - สกุล</th><th>ประเภท</th><th>ลาป่วย</th><th>ลากิจ</th><th>ลาพักผ่อน</th><th class="num">ลาคลอด</th><th class="num">ลารวม</th>${isHR()?'<th>Gmail</th>':''}</tr></thead><tbody>
+   ${L.map(s=>`<tr class="click" data-sid="${s.id}"><td class="muted small">${s.id}</td><td><b style="font-weight:600">${esc(s.name)}</b>${s.dept?`<div class="small muted">${esc(s.dept)}</div>`:''}${active(s)?'':` <span class="tag" style="background:#eee;color:#777">${esc(STATUS[s.status]||s.status)}</span>`}</td><td class="small muted">${GROUPS[s.group]||s.group}</td><td>${cell(s,'sick')}</td><td>${cell(s,'biz')}</td><td>${cell(s,'vac')}</td><td class="num">${U[s.id].mat?fmt(U[s.id].mat):'–'}</td><td class="num"><b>${fmt(tot(s))}</b></td>${isHR()?`<td class="small">${s.email?'✓':'<span style="color:var(--danger)">ยังไม่มี</span>'}</td>`:''}</tr>`).join('')}
+  </tbody></table></div></div>
+  <div class="cards-m">${L.slice(0,150).map(s=>`<div class="mcard" data-sid="${s.id}"><div class="h"><div><b>${esc(s.name)}</b><div class="small muted">${GROUPS[s.group]||''} · ${s.id}</div></div><div class="small" style="text-align:right">ลารวม<br><b>${fmt(tot(s))}</b> วัน</div></div><div class="g3"><div><div class="small muted">ลาป่วย</div>${cell(s,'sick')}</div><div><div class="small muted">ลากิจ</div>${cell(s,'biz')}</div><div><div class="small muted">พักผ่อน</div>${cell(s,'vac')}</div></div></div>`).join('')}${L.length>150?'<div class="small muted">แสดง 150 รายการแรก — พิมพ์ค้นหาเพื่อกรอง</div>':''}</div>`;
+  bindSid($('#slist'));
+}
+function vHist(){
+  return bannerHTML()+`<div class="tools"><div class="search">${ico('search')}<input id="hq" placeholder="ค้นหาชื่อ${isHR()?' / เลขที่ใบลา':''}…" value="${esc(S.hq)}" autocomplete="off"></div>
+   <select class="sel" id="ht"><option value="all">ทุกประเภท</option>${TYPES.map(t=>`<option value="${t.k}" ${S.ht===t.k?'selected':''}>${t.n}</option>`).join('')}</select>
+   <select class="sel" id="hm"><option value="all">ทุกเดือน</option>${fyMonths(S.fy).map(m=>`<option value="${m}" ${S.hm===m?'selected':''}>${mLong(m)}</option>`).join('')}</select></div><div id="hlist"></div>`;
+}
+function renderHist(){
+  const q=S.hq.trim().toLowerCase(),hr=isHR();
+  const L=D.leaves.filter(r=>(S.ht==='all'||r.type===S.ht)&&(S.hm==='all'||r.start.slice(0,7)===S.hm||r.end.slice(0,7)===S.hm)&&(!q||((SBY[r.sid]||{}).name||'').toLowerCase().includes(q)||(r.doc||'').toLowerCase().includes(q))).sort((a,b)=>b.start.localeCompare(a.start)||b.id.localeCompare(a.id));
+  const sum=L.reduce((a,r)=>a+r.days,0),head=`<div class="small muted" style="margin-bottom:8px">${L.length} รายการ · รวม ${fmt(sum)} วัน</div>`;
+  if(!L.length){$('#hlist').innerHTML=head+'<div class="card empty">ไม่พบรายการ</div>';return}
+  const show=L.slice(0,300),nm=r=>esc((SBY[r.sid]||{name:r.sid}).name),dt=r=>`${thd(r.start)}${r.end!==r.start?' – '+thd(r.end):''}${r.half?' <span class="small muted">('+r.half+')</span>':''}`;
+  $('#hlist').innerHTML=head+`<div class="card hide-m"><div class="scroll"><table class="tbl"><thead><tr><th>วันที่ลา</th><th>ชื่อ - สกุล</th><th>ประเภท</th><th class="num">วัน</th>${hr?'<th>เลขที่ใบลา</th><th>หมายเหตุ</th><th>บันทึกโดย</th><th></th>':''}</tr></thead><tbody>
+  ${show.map(r=>`<tr><td style="white-space:nowrap">${dt(r)}</td><td><a href="javascript:void 0" data-sid="${r.sid}" style="color:var(--blue-d);text-decoration:none;font-weight:600">${nm(r)}</a></td><td>${tag(r.type)}</td><td class="num"><b>${fmt(r.days)}</b></td>${hr?`<td class="small">${esc(r.doc)||'<span class="muted">–</span>'}</td><td class="small muted">${esc(r.note)}</td><td class="small muted">${esc((r.by||'').split('@')[0])}</td><td style="white-space:nowrap"><button class="btn sm" data-edit="${r.id}">แก้ไข</button> <button class="btn sm dan" data-del="${r.id}">ลบ</button></td>`:''}</tr>`).join('')}
+  </tbody></table></div></div>
+  <div class="cards-m">${show.slice(0,120).map(r=>`<div class="mcard" data-sid="${r.sid}"><div class="h"><b>${nm(r)}</b>${tag(r.type)}</div><div class="small muted" style="display:flex;justify-content:space-between"><span>${dt(r)}</span><b style="color:var(--text)">${fmt(r.days)} วัน</b></div>${hr&&r.doc?`<div class="small muted">ใบลา: ${esc(r.doc)}</div>`:''}${hr?`<div style="margin-top:8px;display:flex;gap:6px"><button class="btn sm" data-edit="${r.id}">แก้ไข</button><button class="btn sm dan" data-del="${r.id}">ลบ</button></div>`:''}</div>`).join('')}</div>
+  ${L.length>300?'<div class="small muted" style="margin-top:8px">แสดง 300 รายการล่าสุด — ใช้ตัวกรองเพื่อจำกัดผล</div>':''}`;
+  bindSid($('#hlist'));
+  $('#hlist').querySelectorAll('[data-edit]').forEach(b=>b.onclick=e=>{e.stopPropagation();openForm({id:b.dataset.edit})});
+  $('#hlist').querySelectorAll('[data-del]').forEach(b=>b.onclick=e=>{e.stopPropagation();confirmDel(b.dataset.del)});
+}
+function vMonth(){
+  const months=fyMonths(S.fy);if(!S.mm||!months.includes(S.mm)){const c=today.slice(0,7);S.mm=months.includes(c)?c:months[0];}
+  return bannerHTML()+`<div class="tools"><select class="sel" id="mm">${months.map(m=>`<option value="${m}" ${S.mm===m?'selected':''}>${mLong(m)}</option>`).join('')}</select>
+   <label class="small" style="display:flex;gap:6px;align-items:center"><input type="checkbox" id="showAll" ${S.showAll?'checked':''}> แสดงทุกคน</label><span style="flex:1"></span><button class="btn" id="copyT">📋 คัดลอกตาราง</button></div>
+   <div class="card"><div class="pad" style="padding-bottom:6px;text-align:center"><b>สรุปวันลาประเภทต่าง ๆ ของเจ้าหน้าที่ โรงพยาบาลร้องกวาง จังหวัดแพร่</b><div class="small muted">ประจำเดือน ${mLong(S.mm)} · ปีงบประมาณ ${S.fy}</div></div><div class="scroll" id="mtable"></div></div>`;
+}
+function monthRows(){
+  const m=S.mm,endM=m+'-31';
+  return Object.keys(GROUPS).map(g=>({g,L:D.staff.filter(s=>s.group===g&&active(s)).map(s=>{
+    const o={biz:0,sick:0,mat:0,vac:0,oth:0};let vu=0;
+    D.leaves.forEach(r=>{if(r.sid!==s.id)return;if(r.start.slice(0,7)===m)o[['biz','sick','mat','vac'].includes(r.type)?r.type:'oth']+=r.days;if(r.type==='vac'&&r.start<=endM)vu+=r.days;});
+    return {s,o,rem:(quota(s,'vac',S.fy)||0)-vu,any:Object.values(o).some(v=>v>0)};}).filter(x=>S.showAll||x.any)}));
+}
+function renderMonth(){
+  const G=monthRows(),v=n=>n?fmt(n):'';
+  if(!G.some(x=>x.L.length)){$('#mtable').innerHTML='<div class="empty">ไม่มีการลาในเดือนนี้</div>';return}
+  $('#mtable').innerHTML=`<table class="tbl"><thead><tr><th style="width:50px">ลำดับ</th><th>ชื่อ - สกุล</th><th class="num">ลากิจ</th><th class="num">ลาป่วย</th><th class="num">ลาคลอด</th><th class="num">ลาพักผ่อน</th><th class="num">ลาอื่น ๆ</th><th class="num">พักผ่อนคงเหลือ</th></tr></thead><tbody>
+  ${G.map(({g,L})=>L.length?`<tr class="grp"><td colspan="8">${GROUPS[g]} (${L.length} คน)</td></tr>`+L.map((x,i)=>`<tr class="click" data-sid="${x.s.id}"><td class="muted">${i+1}</td><td>${esc(x.s.name)}</td><td class="num">${v(x.o.biz)}</td><td class="num">${v(x.o.sick)}</td><td class="num">${v(x.o.mat)}</td><td class="num">${v(x.o.vac)}</td><td class="num">${v(x.o.oth)}</td><td class="num"><b>${fmt(x.rem)}</b></td></tr>`).join(''):'').join('')}</tbody></table>`;
+  bindSid($('#mtable'));
+}
+function copyMonth(){
+  const lines=[['ลำดับ','ชื่อ-สกุล','ลากิจ','ลาป่วย','ลาคลอด','ลาพักผ่อน','ลาอื่นๆ','ลาพักผ่อนคงเหลือ'].join('\t')];
+  monthRows().forEach(({g,L})=>{if(!L.length)return;lines.push(GROUPS[g]);L.forEach((x,i)=>lines.push([i+1,x.s.name,x.o.biz||'',x.o.sick||'',x.o.mat||'',x.o.vac||'',x.o.oth||'',x.rem].join('\t')))});
+  const txt=lines.join('\n');
+  (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>toast('คัดลอกแล้ว — วางใน Google Sheet/Excel ได้ทันที')).catch(()=>modal('คัดลอกตาราง',`<p class="small muted">กด Ctrl/⌘+A แล้ว Ctrl/⌘+C</p><textarea style="width:100%;height:260px">${esc(txt)}</textarea>`));
+}
+/* ---- log ---- */
+function vLog(){return `<div class="grid kpis" id="lkpi"></div><div class="card pad" style="margin-top:14px"><h2>ผู้เข้าชม 30 วันล่าสุด</h2><div id="lchart" class="empty">กำลังโหลด…</div></div>
+ <div class="tools" style="margin-top:14px"><div class="search">${ico('search')}<input id="lq" placeholder="ค้นหาอีเมล / การกระทำ / รายละเอียด…" value="${esc(S.lq)}"></div><select class="sel" id="la"><option value="">ทุกการกระทำ</option><option value="view">เข้าชม</option><option value="login">login</option><option value="leave_">บันทึก/แก้/ลบการลา</option><option value="staff_">ข้อมูลเจ้าหน้าที่</option><option value="user_">จัดการผู้ใช้</option><option value="fail">ผิดพลาด/ไม่ผ่าน</option><option value="backup">backup</option></select><button class="btn" id="lref">↻ โหลดใหม่</button></div><div id="llist"></div>`;}
+async function loadLogs(){try{const r=await run('apiGetLogs',TOKEN,2000);LOGS=r.logs;STATS=r.stats;renderLogs();renderNav();}catch(e){}}
+function renderLogs(){
+  const st=STATS||{};
+  $('#lkpi').innerHTML=[['วันนี้',st.today,st.todayUsers],['เดือนนี้',st.month,st.monthUsers],['ทั้งหมด',st.total,null]].map(([l,v,u])=>`<div class="card pad kpi"><div class="l">ผู้เข้าชม${l}</div><div class="v">${(v||0).toLocaleString()} <small>ครั้ง</small></div><div class="s">${u!=null?u+' คน (ไม่ซ้ำ)':'นับทุกครั้งที่เปิดระบบ'}</div></div>`).join('')+`<div class="card pad kpi"><div class="l">Log ที่โหลด</div><div class="v">${LOGS?LOGS.length.toLocaleString():'–'} <small>แถว</small></div><div class="s">ล่าสุด 2,000 รายการ</div></div>`;
+  const days=st.days||[],mx=Math.max(1,...days.map(d=>d[1]));
+  $('#lchart').className='';
+  $('#lchart').innerHTML=`<div class="vchart">${days.map(d=>`<i title="${d[0].slice(6)}/${d[0].slice(4,6)}: ${d[1]} ครั้ง ${d[2]} คน" style="height:${d[1]/mx*100}%"></i>`).join('')}</div><div style="display:flex;justify-content:space-between" class="small muted"><span>${days[0]?days[0][0].slice(6)+'/'+days[0][0].slice(4,6):''}</span><span>วันนี้</span></div>`;
+  if(!LOGS){$('#llist').innerHTML='';return}
+  const q=S.lq.trim().toLowerCase(),a=$('#la').value;
+  const L=LOGS.filter(r=>(!a||r[3].includes(a))&&(!q||r.join(' ').toLowerCase().includes(q)));
+  const AN={view:'เข้าชม',login:'login',login_denied:'ปฏิเสธ (ไม่ลงทะเบียน)',otp_fail:'รหัส OTP ผิด',pin_ok:'เข้าโหมด HR',pin_fail:'PIN ผิด',pin_set:'ตั้ง PIN',pin_change:'เปลี่ยน PIN',leave_add:'เพิ่มการลา',leave_edit:'แก้ไขการลา',leave_delete:'ลบการลา',staff_add:'เพิ่มเจ้าหน้าที่',staff_edit:'แก้ไขเจ้าหน้าที่',quota_edit:'แก้สิทธิ์ลา',holiday_add:'เพิ่มวันหยุด',holiday_del:'ลบวันหยุด',vac_rollover:'ยกยอดพักผ่อน',backup:'สำรองข้อมูล',trigger_install:'ตั้ง trigger',user_add:'เพิ่มผู้ใช้',user_edit:'แก้ไขผู้ใช้',user_delete:'ลบผู้ใช้',user_pin_reset:'รีเซ็ต PIN'};
+  $('#llist').innerHTML=`<div class="small muted" style="margin-bottom:8px">${L.length} รายการ</div><div class="card"><div class="scroll"><table class="tbl"><thead><tr><th>เวลา</th><th>ผู้ใช้</th><th>สิทธิ์</th><th>การกระทำ</th><th>รายละเอียด</th><th>อุปกรณ์</th></tr></thead><tbody>${L.slice(0,500).map(r=>`<tr><td class="small" style="white-space:nowrap">${esc(r[0])}</td><td class="small">${esc(r[1])}</td><td class="small muted">${esc(r[2])}</td><td><span class="tag" style="background:${/fail|denied/.test(r[3])?'#FDECEC;color:var(--danger)':/leave|staff|quota|holiday|vac/.test(r[3])?'#FFF6E5;color:#8A5A0B':'var(--blue-l);color:var(--blue-d)'}">${esc(AN[r[3]]||r[3])}</span></td><td class="small muted" style="max-width:380px;word-break:break-word">${esc(r[4])}</td><td class="small muted">${esc(r[5])}</td></tr>`).join('')}</tbody></table></div></div>`;
+}
+/* ---- settings ---- */
+function vSet(){
+  const hr=isHR(),keys=['sick','biz','vac','mat','pat','ord'];
+  const qv=(g,k,f)=>{const q=(D.quota[g]||{})[k];return q&&q[f]!=null?q[f]:''};
+  return bannerHTML()+`<div class="grid two"><div class="card pad"><h2>สิทธิ์การลาต่อปีงบประมาณ (วัน)</h2>
+   <div class="small muted" style="margin-bottom:10px">ตามระเบียบสำนักนายกรัฐมนตรีว่าด้วยการลาของข้าราชการ พ.ศ. 2555 และหลักเกณฑ์ของโรงพยาบาล${hr?' — แก้ตัวเลขแล้วกด Tab/Enter เพื่อบันทึก · ช่องว่าง = ไม่กำหนด':''}</div>
+   <div style="overflow:auto"><table class="tbl qt"><thead><tr><th>ประเภทบุคลากร</th>${keys.map(k=>`<th class="num">${T[k].n.replace('ลา','')}</th>`).join('')}<th class="num">ป่วย/กิจ ปีแรก</th><th class="num">สะสมพักผ่อนสูงสุด</th></tr></thead><tbody>
+   ${Object.entries(GROUPS).map(([g,n])=>`<tr><td><b style="font-weight:600">${n}</b></td>${keys.map(k=>`<td class="num"><input data-q="${g}|${k}|days" value="${qv(g,k,'days')}" ${hr?'':'disabled'}></td>`).join('')}<td class="num small">${qv(g,'sick','first')!==''?'ป่วย '+qv(g,'sick','first'):''}${qv(g,'biz','first')!==''?'กิจ '+qv(g,'biz','first'):''}</td><td class="num"><input data-q="${g}|vac|max" value="${qv(g,'vac','max')}" ${hr?'':'disabled'}>${qv(g,'vac','max10')!==''?`<div class="small muted">≥10 ปี: ${qv(g,'vac','max10')}</div>`:''}</td></tr>`).join('')}
+   </tbody></table></div>
+   <div class="small" style="margin-top:12px;line-height:1.8">• <b>ลาพักผ่อน</b> ต้องปฏิบัติงานครบ 6 เดือน · ข้าราชการ/ลูกจ้างประจำ สะสมรวมไม่เกิน 20 วัน (รับราชการ ≥ 10 ปี ไม่เกิน 30 วัน) · พกส./พนักงานราชการ สะสมได้ไม่เกิน 5 วัน/ปี · ลูกจ้างชั่วคราวไม่สะสม<br>• <b>ลาป่วย</b> พกส./ลูกจ้างชั่วคราว ทำงานไม่ครบ 1 ปีงบ มีสิทธิ์ 8 วัน · ลาป่วย 3 วันขึ้นไปต้องมีใบรับรองแพทย์<br>• <b>ลากิจ</b> ข้าราชการปีแรก 15 วันทำการ · ลูกจ้างชั่วคราวหักค่าจ้างตามจริง<br>• นับ <b>วันทำการ</b> ยกเว้นลาคลอด/อุปสมบทนับวันปฏิทิน</div></div>
+   <div class="grid" style="align-content:start">
+    <div class="card pad"><h2>วันหยุดราชการ</h2><div style="max-height:260px;overflow:auto;font-size:13.5px">${D.holidays.map(h=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line2)"><span>${thd(h[0])} <span class="muted">${esc(h[1])}</span></span>${hr?`<button class="btn sm dan" data-hdel="${h[0]}">ลบ</button>`:''}</div>`).join('')||'<div class="muted">ยังไม่มีข้อมูล</div>'}</div>
+     ${hr?`<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap"><input type="date" id="hd" class="sel"><input id="hn" class="sel" placeholder="ชื่อวันหยุด" style="flex:1;min-width:120px"><button class="btn" id="hadd">เพิ่ม</button></div>`:''}</div>
+    ${hr?`<div class="card pad" id="adminBox"><h2>สำรองข้อมูล & ผู้ใช้ HR</h2><div class="empty">กำลังโหลด…</div></div>`:''}
+   </div></div>`;
+}
+async function loadAdmin(){
+  try{ADMIN=await api('apiAdminInfo',TOKEN);}catch(e){$('#adminBox').innerHTML='<h2>สำรองข้อมูล</h2><div class="alert e">'+esc(e.message)+'</div>';return}
+  const A=ADMIN,nf=+S.fy+1;
+  $('#adminBox').innerHTML=`<h2>สำรองข้อมูลอัตโนมัติ</h2>
+   <div class="qbox"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><div><b>ทุกวันที่ 1 ของเดือน เวลา 06:00 น.</b><div class="small muted">ส่งไฟล์ .xlsx ทั้งฐานข้อมูลแนบอีเมล + เก็บสำเนาใน Google Drive</div></div>
+   <span class="tag" style="align-self:center;background:${A.trigger?'#E3F4EA;color:var(--ok)':'#FDECEC;color:var(--danger)'}">● ${A.trigger?'เปิดใช้งาน':'ยังไม่ได้ตั้ง'}</span></div>
+   <div class="small" style="margin-top:6px">ผู้รับ: ${esc(A.backupEmails)} <span class="muted">(แก้ได้ที่ชีต Config)</span></div><div class="small muted">โควตาอีเมลคงเหลือวันนี้: ${A.mailQuota}</div></div>
+   ${A.backups.length?`<table class="tbl"><tbody>${A.backups.slice(0,6).map(b=>`<tr><td class="small">${esc(b.at)}</td><td class="small">${esc(b.file)}</td><td>${b.status==='OK'?'<span class="tag" style="background:#E3F4EA;color:var(--ok)">ส่งแล้ว</span>':`<span class="tag" style="background:#FDECEC;color:var(--danger)" title="${esc(b.msg)}">ล้มเหลว</span>`}</td></tr>`).join('')}</tbody></table>`:'<div class="small muted">ยังไม่มีประวัติการสำรอง</div>'}
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="btn" id="bkNow">สำรองตอนนี้</button>${A.trigger?'':'<button class="btn pri" id="bkTrig">ตั้ง trigger รายเดือน</button>'}<button class="btn" id="clr">↻ ล้าง cache ข้อมูล</button></div>
+   <h3 style="margin-top:18px">ตรวจสอบ Gmail เจ้าหน้าที่</h3><div class="small muted" style="margin-bottom:8px">ใช้เมื่อเจ้าหน้าที่แจ้งว่าเข้าระบบไม่ได้</div>
+   <div style="display:flex;gap:6px;flex-wrap:wrap"><input id="ckE" class="sel" type="email" placeholder="name@gmail.com" style="flex:1;min-width:180px"><button class="btn" id="ckB">ตรวจสอบ</button></div><div id="ckR"></div>
+   <h3 style="margin-top:18px">ยกยอดวันลาพักผ่อน</h3><div class="small muted" style="margin-bottom:8px">คำนวณสิทธิ์ปีงบ ${nf} = คงเหลือปี ${S.fy} + 10 วัน (ไม่เกินเพดานสะสมของแต่ละประเภท) — ไม่ทับคนที่กำหนดไว้แล้ว</div><button class="btn" id="roll">ยกยอด ${S.fy} → ${nf}</button>
+   <div style="display:flex;justify-content:space-between;align-items:center;margin-top:18px;gap:8px"><h3 style="margin:0">ผู้ใช้งานระบบ (STAFF / HR / ADMIN)</h3>${USER.hrRole==='ADMIN'?'<button class="btn sm pri" id="uAdd" style="white-space:nowrap;flex:none">+ เพิ่มผู้ใช้</button>':''}</div>
+   <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap"><input id="uQ" class="sel" placeholder="ค้นหาชื่อ / Gmail" style="flex:1;min-width:150px"><select id="uR" class="sel"><option value="">ทุกบทบาท</option><option>STAFF</option><option>HR</option><option>ADMIN</option></select></div>
+   <div id="uCnt" class="small muted" style="margin-top:6px"></div><div id="uList" style="max-height:420px;overflow:auto"></div>
+   <div class="small muted" style="margin-top:6px">${USER.hrRole==='ADMIN'?'ADMIN เพิ่ม/แก้/ปิดสิทธิ์/รีเซ็ต PIN ได้ที่นี่ · ':'การจัดการผู้ใช้ทำได้เฉพาะ ADMIN · '}โหมดการเข้าดู: <b>${A.viewMode==='any'?'Gmail ใดก็ได้':'เฉพาะ Gmail ที่ลงทะเบียน'}</b></div>`;
+  renderUsers(A.users);
+  $('#ckB').onclick=async()=>{const e=$('#ckE').value.trim();if(!e)return;try{const r=await run('apiCheckEmail',TOKEN,e);
+    $('#ckR').innerHTML=`<div class="alert ${r.canLogin?'i':'e'}">${r.canLogin?'✅ เข้าระบบได้':'⛔ เข้าระบบไม่ได้: '+esc(r.reason)}<div class="small" style="margin-top:4px">${r.found.length?r.found.map(esc).join('<br>'):'ไม่พบในชีต Staff และ Users'}</div></div>`;}catch(e){}};
+  $('#bkNow').onclick=async()=>{try{const r=await run('apiRunBackup',TOKEN);toast('สำรองและส่งอีเมลแล้ว: '+r.file);loadAdmin();}catch(e){}};
+  const t=$('#bkTrig');if(t)t.onclick=async()=>{try{await run('apiInstallTrigger',TOKEN);toast('ตั้ง trigger แล้ว');loadAdmin();}catch(e){}};
+  $('#clr').onclick=async()=>{try{await run('apiClearCache',TOKEN);await reloadFy();toast('โหลดข้อมูลล่าสุดแล้ว');}catch(e){}};
+  $('#roll').onclick=()=>{modal('ยืนยันยกยอดวันลาพักผ่อน',`<p>คำนวณสิทธิ์ลาพักผ่อนปีงบ <b>${nf}</b> จากวันคงเหลือปีงบ <b>${S.fy}</b> ของเจ้าหน้าที่ทุกคนที่ยังปฏิบัติงาน</p><label class="small"><input type="checkbox" id="ow"> เขียนทับคนที่มีสิทธิ์ปี ${nf} อยู่แล้ว</label>`,`<button class="btn" id="rn">ยกเลิก</button><button class="btn pri" id="ry">ยกยอด</button>`);
+    $('#rn').onclick=closeLayer;$('#ry').onclick=async()=>{const ow=$('#ow').checked;closeLayer();try{const r=await run('apiRolloverVac',TOKEN,S.fy,ow);toast(`ยกยอดแล้ว ${r.count} คน (ข้าม ${r.skipped})`);}catch(e){}}};
+}
+
+function renderUsers(users){
+  ADMIN.users=users;const adm=USER.hrRole==='ADMIN';
+  const RC={ADMIN:'#EEE8FB;color:#5B4BB7',HR:'var(--blue-l);color:var(--blue-d)',STAFF:'#EEF1F4;color:#4A5768'};
+  const q=($('#uQ')&&$('#uQ').value||'').trim().toLowerCase(),rf=$('#uR')?$('#uR').value:'';
+  const L=users.filter(u=>(!rf||u.role===rf)&&(!q||(u.name+' '+u.email).toLowerCase().includes(q)));
+  const cnt=r=>users.filter(u=>u.role===r&&u.active).length;
+  $('#uCnt').textContent=`ใช้งาน: STAFF ${cnt('STAFF')} · HR ${cnt('HR')} · ADMIN ${cnt('ADMIN')} คน${L.length!==users.length?' · แสดง '+L.length+' รายการ':''}`;
+  const st=u=>!u.active?'<span style="color:var(--danger)">ปิดใช้งาน</span>':u.role==='STAFF'?'ดูอย่างเดียว (ไม่ใช้ PIN)':!/^(HR|ADMIN)$/.test(u.role)?'<span style="color:var(--danger)">บทบาทไม่ถูกต้อง</span>':u.hasPin?'ตั้ง PIN แล้ว':'รอตั้ง PIN ครั้งแรก';
+  $('#uList').innerHTML=L.map(u=>`<div class="small" style="padding:8px 0;border-bottom:1px solid var(--line2);display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap">
+    <div style="min-width:0"><b style="font-weight:600">${esc(u.name||u.email)}</b> <span class="tag" style="background:${RC[u.role]||'#FDECEC;color:var(--danger)'}">${esc(u.role||'?')}</span>${u.email===USER.email?' <span class="muted">(คุณ)</span>':''}<div class="muted">${esc(u.email)} · ${st(u)}</div></div>
+    ${adm?`<div style="display:flex;gap:6px"><button class="btn sm" data-uedit="${esc(u.email)}">แก้ไข</button>${u.hasPin&&u.role!=='STAFF'?`<button class="btn sm" data-upin="${esc(u.email)}">รีเซ็ต PIN</button>`:''}</div>`:''}</div>`).join('')||'<div class="small muted" style="padding:8px 0">ไม่พบผู้ใช้</div>';
+  const uq=$('#uQ');if(uq&&!uq.dataset.b){uq.dataset.b=1;uq.oninput=()=>renderUsers(ADMIN.users);$('#uR').onchange=()=>renderUsers(ADMIN.users);}
+  if(!adm)return;
+  const a=$('#uAdd');if(a)a.onclick=()=>userForm();
+  document.querySelectorAll('[data-uedit]').forEach(b=>b.onclick=()=>userForm(ADMIN.users.find(u=>u.email===b.dataset.uedit)));
+  document.querySelectorAll('[data-upin]').forEach(b=>b.onclick=()=>{
+    modal('รีเซ็ต PIN',`<p>รีเซ็ต PIN ของ <b>${esc(b.dataset.upin)}</b> ?</p><p class="small muted">ผู้ใช้จะต้องตั้ง PIN ใหม่หลังยืนยันรหัสจาก Gmail ในการเข้าโหมด HR ครั้งถัดไป</p>`,`<button class="btn" id="rn">ยกเลิก</button><button class="btn pri" id="ry">รีเซ็ต</button>`);
+    $('#rn').onclick=closeLayer;$('#ry').onclick=async()=>{try{const r=await run('apiResetUserPin',TOKEN,b.dataset.upin);closeLayer();renderUsers(r.users);toast('รีเซ็ต PIN แล้ว');}catch(e){}};});
+}
+function userForm(u){
+  const ed=!!u;u=u||{email:'',name:'',role:'STAFF',active:true};const self=u.email===USER.email;
+  modal(ed?'แก้ไขผู้ใช้':'เพิ่มผู้ใช้งานระบบ',`
+   <div class="f"><label>Gmail *</label><input id="ue" type="email" value="${esc(u.email)}" placeholder="name@gmail.com"></div>
+   <div class="f"><label>ชื่อ - สกุล</label><input id="un" value="${esc(u.name)}"></div>
+   <div class="row2"><div class="f"><label>บทบาท</label><select id="ur"><option value="STAFF" ${u.role==='STAFF'?'selected':''}>STAFF — ดูอย่างเดียว</option><option value="HR" ${u.role==='HR'?'selected':''}>HR — บันทึก/แก้ไขการลา</option><option value="ADMIN" ${u.role==='ADMIN'?'selected':''}>ADMIN — HR + จัดการผู้ใช้</option></select></div>
+   <div class="f"><label>สถานะ</label><select id="ua"><option value="1" ${u.active?'selected':''}>ใช้งาน</option><option value="0" ${u.active?'':'selected'}>ปิดใช้งาน</option></select></div></div>
+   <div class="small muted">STAFF: เข้าเว็บด้วย Gmail นี้ → ยืนยันรหัสจากอีเมล → ดูข้อมูลได้อย่างเดียว<br>HR/ADMIN: ยืนยันรหัสจากอีเมล → ตั้ง PIN 6 หลักเองครั้งแรก${ed?' · เปลี่ยนอีเมลจะล้าง PIN เดิม':''}</div>`,
+   `${ed&&!self?'<button class="btn dan" id="ud" style="margin-right:auto">ลบผู้ใช้</button>':''}<button class="btn" id="uc">ยกเลิก</button><button class="btn pri" id="us">บันทึก</button>`);
+  $('#uc').onclick=closeLayer;
+  $('#us').onclick=async()=>{const x={email:$('#ue').value.trim().toLowerCase(),name:$('#un').value.trim(),role:$('#ur').value,active:$('#ua').value==='1'};
+    if(!x.email){toast('กรุณากรอก Gmail',true);return}
+    try{const r=await run('apiSaveUser',TOKEN,x,ed?u.email:'');closeLayer();renderUsers(r.users);toast(ed?'บันทึกแล้ว':'เพิ่มผู้ใช้แล้ว');
+      if(self&&(x.role!=='ADMIN'||!x.active||x.email!==u.email))start(LS.get('lv_view'));}catch(e){}};
+  const d=$('#ud');if(d)d.onclick=async()=>{if(d.dataset.c!=='1'){d.dataset.c='1';d.textContent='กดอีกครั้งเพื่อยืนยันลบ';return}
+    try{const r=await run('apiDeleteUser',TOKEN,u.email);closeLayer();renderUsers(r.users);toast('ลบผู้ใช้แล้ว');}catch(e){}};
+}
+/* ===================== drawer & modals ===================== */
+function bindSid(root){root.querySelectorAll('[data-sid]').forEach(e=>e.addEventListener('click',ev=>{if(ev.target.closest('[data-edit],[data-del]'))return;openStaff(e.dataset.sid)}));}
+function openStaff(sid){
+  const s=SBY[sid];if(!s)return;const fy=S.fy,u=usage(sid),hr=isHR();
+  const recs=D.leaves.filter(r=>r.sid===sid).sort((a,b)=>b.start.localeCompare(a.start));
+  const box=k=>{const q=quota(s,k,fy),rem=q!=null?q-u[k]:null;return `<div class="card pad" style="padding:12px"><div class="small muted"><span class="dot" style="background:${T[k].c}"></span>${T[k].n}</div><div style="font-size:22px;font-weight:700">${fmt(u[k])}<small class="muted" style="font-size:13px;font-weight:500"> / ${q??'ไม่กำหนด'}</small></div>${q!=null?`<div class="bar"><i style="width:${q?Math.min(100,u[k]/q*100):0}%;background:${u[k]>q?'var(--danger)':T[k].c}"></i></div><div class="small" style="margin-top:4px">คงเหลือ <b>${fmt(rem)}</b> วัน</div>`:''}</div>`};
+  $('#layer').innerHTML=`<div class="ov" id="ovd"></div><div class="drawer">
+   <div class="mh"><div style="display:flex;gap:10px;align-items:center;min-width:0"><div class="av" style="width:42px;height:42px">${esc(initials(s.name))}</div><div style="min-width:0"><h2>${esc(s.name)}</h2><div class="small muted">${s.id} · ${GROUPS[s.group]||s.group}${s.position?' · '+esc(s.position):''}${s.dept?' · '+esc(s.dept):''}${s.start?' · เริ่มงาน '+thd(s.start):''}${active(s)?'':' · '+esc(STATUS[s.status]||s.status)}</div></div></div><button class="x" id="cx">×</button></div>
+   <div class="mb"><div class="small muted" style="margin-bottom:8px">ปีงบประมาณ ${fy}</div>
+    <div class="grid" style="grid-template-columns:1fr 1fr;gap:10px">${['vac','sick','biz','mat'].map(box).join('')}</div>
+    ${hr?`<div style="display:flex;gap:8px;margin-top:14px"><button class="btn pri" style="flex:1" id="addFor">+ บันทึกการลา</button><button class="btn" id="editSt">แก้ไขข้อมูล</button></div>`:''}
+    <h3 style="margin-top:18px">ประวัติการลา (${recs.length} ครั้ง)</h3>
+    ${recs.length?recs.map(r=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--line2);gap:8px"><div>${tag(r.type)}<div class="small" style="margin-top:3px">${thd(r.start)}${r.end!==r.start?' – '+thd(r.end):''} ${r.half?'('+r.half+')':''}</div>${hr&&(r.doc||r.note)?`<div class="small muted">${esc([r.doc,r.note].filter(Boolean).join(' · '))}</div>`:''}</div><div style="text-align:right"><b>${fmt(r.days)}</b> วัน${hr?`<div><button class="btn sm" data-edit="${r.id}">แก้ไข</button></div>`:''}</div></div>`).join(''):'<div class="empty">ไม่มีการลาในปีงบนี้</div>'}
+   </div></div>`;
+  $('#ovd').onclick=closeLayer;$('#cx').onclick=closeLayer;
+  if(hr){$('#addFor').onclick=()=>openForm({sid});$('#editSt').onclick=()=>staffForm(sid);document.querySelectorAll('.drawer [data-edit]').forEach(b=>b.onclick=()=>openForm({id:b.dataset.edit}));}
+}
+function closeLayer(){$('#layer').innerHTML='';}
+function modal(title,body,foot=''){
+  $('#layer').innerHTML=`<div class="ov" id="ovm"><div class="modal" role="dialog"><div class="mh"><h2>${title}</h2><button class="x" id="cx">×</button></div><div class="mb">${body}</div>${foot?`<div class="mf">${foot}</div>`:''}</div></div>`;
+  $('#cx').onclick=closeLayer;$('#ovm').onclick=e=>{if(e.target.id==='ovm')closeLayer()};
+}
+function confirmDel(id){
+  const r=D.leaves.find(x=>x.id===id);if(!r)return;
+  modal('ยืนยันการลบรายการ',`<p>ลบ ${tag(r.type)} ของ <b>${esc(SBY[r.sid].name)}</b><br>${thd(r.start)}${r.end!==r.start?' – '+thd(r.end):''} (${fmt(r.days)} วัน) ?</p><p class="small muted">ข้อมูลที่ลบจะถูกเก็บรายละเอียดไว้ใน AccessLog</p>`,`<button class="btn" id="no">ยกเลิก</button><button class="btn pri" style="background:var(--danger);border-color:var(--danger)" id="yes">ลบรายการ</button>`);
+  $('#no').onclick=closeLayer;$('#yes').onclick=async()=>{try{const res=await run('apiDeleteLeave',TOKEN,id);closeLayer();setData(res.data);render();toast('ลบรายการแล้ว');}catch(e){}};
+}
+function staffForm(sid){
+  const s=sid?SBY[sid]:{group:'gov',status:'active'};const vac=sid&&D.vac[sid]!=null?D.vac[sid]:'';
+  modal(sid?'แก้ไขข้อมูลเจ้าหน้าที่':'เพิ่มเจ้าหน้าที่',`
+   <div class="f"><label>ชื่อ - สกุล *</label><input id="sn" value="${esc(s.name||'')}"></div>
+   <div class="row2"><div class="f"><label>ประเภทบุคลากร *</label><select id="sg">${Object.entries(GROUPS).map(([k,n])=>`<option value="${k}" ${s.group===k?'selected':''}>${n}</option>`).join('')}</select></div>
+   <div class="f"><label>สถานะ</label><select id="ss">${Object.entries(STATUS).map(([k,n])=>`<option value="${k}" ${s.status===k?'selected':''}>${n}</option>`).join('')}</select></div></div>
+   <div class="row2"><div class="f"><label>ตำแหน่ง</label><input id="sp" value="${esc(s.position||'')}"></div><div class="f"><label>หน่วยงาน</label><input id="sd" value="${esc(s.dept||'')}"></div></div>
+   <div class="f"><label>Gmail (ใช้เข้าดูข้อมูล)</label><input id="se" type="email" value="${esc(s.email||'')}" placeholder="name@gmail.com"></div>
+   <div class="row2"><div class="f"><label>วันเริ่มปฏิบัติงาน</label><input id="sst" type="date" value="${esc(s.start||'')}"></div><div class="f"><label>สิทธิ์ลาพักผ่อนปีงบ ${S.fy} (รวมยกยอด)</label><input id="sv" type="number" step="0.5" min="0" value="${vac}" placeholder="ค่าตามประเภท"></div></div>
+   <div class="f"><label>หมายเหตุ</label><input id="sno" value="${esc(s.note||'')}"></div>`,
+   `<button class="btn" id="sc">ยกเลิก</button><button class="btn pri" id="sv2">บันทึก</button>`);
+  $('#sc').onclick=closeLayer;
+  $('#sv2').onclick=async()=>{const st={id:sid||'',name:$('#sn').value.trim(),group:$('#sg').value,status:$('#ss').value,position:$('#sp').value.trim(),dept:$('#sd').value.trim(),email:$('#se').value.trim(),start:$('#sst').value,note:$('#sno').value.trim(),vacDays:$('#sv').value};
+    if(!st.name){toast('กรุณาระบุชื่อ-สกุล',true);return}
+    try{const r=await run('apiSaveStaff',TOKEN,st,S.fy);setData(r.data);closeLayer();render();toast(sid?'บันทึกข้อมูลแล้ว':'เพิ่มเจ้าหน้าที่แล้ว ('+r.id+')');}catch(e){}};
+}
+function openForm({id,sid}={}){
+  const ed=id?D.leaves.find(r=>r.id===id):null;
+  const F={sid:ed?ed.sid:(sid||''),type:ed?ed.type:'sick',manual:!!ed};
+  modal(ed?'แก้ไขรายการลา':'บันทึกการลา',`
+   <div class="f"><label>เจ้าหน้าที่ *</label><div class="combo"><input id="fs" placeholder="พิมพ์ชื่อเพื่อค้นหา…" autocomplete="off" value="${F.sid?esc(SBY[F.sid].name):''}"><div class="opts hidden" id="fopts"></div></div></div>
+   <div class="f"><label>ประเภทการลา *</label><div class="typegrid" id="ftype">${TYPES.map(t=>`<button type="button" class="tbtn ${F.type===t.k?'on':''}" data-t="${t.k}"><span class="dot" style="background:${t.c}"></span>${t.n}</button>`).join('')}</div></div>
+   <div class="row2"><div class="f"><label>ตั้งแต่วันที่ *</label><input type="date" id="fa" value="${ed?ed.start:today}"></div><div class="f"><label>ถึงวันที่ *</label><input type="date" id="fb" value="${ed?ed.end:today}"></div></div>
+   <div class="row2"><div class="f"><label>ช่วงเวลา</label><select id="fh"><option value="">เต็มวัน</option><option value="ครึ่งเช้า">ครึ่งวันเช้า</option><option value="ครึ่งบ่าย">ครึ่งวันบ่าย</option></select></div>
+   <div class="f"><label>จำนวนวันลา <span class="muted" style="font-weight:400" id="funit"></span></label><input type="number" step="0.5" min="0" id="fd"></div></div>
+   <div id="fq"></div>
+   <div class="row2"><div class="f"><label>เลขที่ใบลา / เลขรับ</label><input id="fdoc" value="${esc(ed?ed.doc:'')}" placeholder="เช่น ลป.123/2570"></div><div class="f"><label>หมายเหตุ</label><input id="fnote" value="${esc(ed?ed.note:'')}" placeholder="ไม่บังคับ"></div></div>`,
+   `<button class="btn" id="fcancel">ยกเลิก</button><button class="btn pri" id="fsave">${ed?'บันทึกการแก้ไข':'บันทึก'}</button>`);
+  $('#fh').value=ed?ed.half:'';
+  const fs=$('#fs'),op=$('#fopts');let hl=0,cur=[];
+  const showOpts=()=>{const q=fs.value.trim().toLowerCase();cur=D.staff.filter(s=>active(s)&&(!q||s.name.toLowerCase().includes(q)||s.id.toLowerCase()===q)).slice(0,30);hl=0;
+    op.innerHTML=cur.map((s,i)=>`<div data-i="${i}" class="${i===0?'hl':''}"><span>${esc(s.name)}</span><span class="small muted">${(GROUPS[s.group]||'').split('/')[0]}</span></div>`).join('')||'<div class="muted">ไม่พบชื่อ</div>';op.classList.remove('hidden');
+    op.querySelectorAll('[data-i]').forEach(d=>d.onmousedown=e=>{e.preventDefault();pick(cur[+d.dataset.i])});};
+  const pick=s=>{F.sid=s.id;fs.value=s.name;op.classList.add('hidden');calc();};
+  fs.oninput=()=>{F.sid='';showOpts();calc()};fs.onfocus=showOpts;fs.onblur=()=>setTimeout(()=>op.classList.add('hidden'),150);
+  fs.onkeydown=e=>{const it=op.querySelectorAll('[data-i]');if(!it.length)return;if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();hl=(hl+(e.key==='ArrowDown'?1:-1)+it.length)%it.length;it.forEach((d,i)=>d.classList.toggle('hl',i===hl))}if(e.key==='Enter'&&cur[hl]){e.preventDefault();pick(cur[hl])}};
+  $('#ftype').querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{F.type=b.dataset.t;$('#ftype').querySelectorAll('.tbtn').forEach(x=>x.classList.toggle('on',x===b));F.manual=false;calc();});
+  $('#fa').onchange=()=>{if($('#fb').value<$('#fa').value)$('#fb').value=$('#fa').value;F.manual=false;calc()};
+  $('#fb').onchange=()=>{F.manual=false;calc()};$('#fh').onchange=()=>{F.manual=false;calc()};
+  $('#fd').oninput=()=>{F.manual=true;calc()};
+  function calc(){
+    const a=$('#fa').value,b=$('#fb').value,t=T[F.type],multi=a&&b&&a!==b;
+    $('#fh').disabled=multi;if(multi)$('#fh').value='';
+    let auto=workDays(a,b,t.unit);if($('#fh').value&&auto>0)auto=0.5;
+    $('#funit').textContent=t.unit==='cal'?'(นับวันปฏิทิน)':'(วันทำการ คำนวณอัตโนมัติ แก้ได้)';
+    if(!F.manual)$('#fd').value=auto;
+    const days=parseFloat($('#fd').value)||0;
+    if(!F.sid){$('#fq').innerHTML='<div class="alert i" style="margin:0 0 14px">เลือกเจ้าหน้าที่เพื่อตรวจสอบสิทธิ์คงเหลือ</div>';return}
+    const s=SBY[F.sid],fy=a?fyOf(a):S.fy,sameFy=fy===S.fy;
+    const u=sameFy?usage(s.id,ed&&ed.id)[F.type]:null,q=sameFy?quota(s,F.type,fy):null,msgs=[];
+    if(a&&b&&fyOf(a)!==fyOf(b))msgs.push(['e','วันลาข้ามปีงบประมาณ — กรุณาแยกบันทึกเป็น 2 รายการ']);
+    if(b<a)msgs.push(['e','วันสิ้นสุดต้องไม่ก่อนวันเริ่ม']);
+    if(!sameFy)msgs.push(['i',`รายการนี้อยู่ในปีงบ ${fy} (หน้าจอแสดงปีงบ ${S.fy}) — ระบบจะบันทึกเข้าปีงบ ${fy}`]);
+    if(days<=0&&a&&b>=a)msgs.push(['w','จำนวนวันลาเป็น 0 (ช่วงที่เลือกเป็นวันหยุด) — หากขึ้นเวรวันหยุดให้แก้จำนวนวันเอง']);
+    if(q!=null&&u+days>q)msgs.push(['e',`เกินสิทธิ์ ${t.n} (${fmt(u+days)}/${q} วัน) — กรุณาตรวจสอบก่อนบันทึก`]);
+    if(F.type==='vac'&&monthsServed(s,a)<6)msgs.push(['w','ปฏิบัติงานยังไม่ครบ 6 เดือน — ยังไม่มีสิทธิ์ลาพักผ่อนตามระเบียบ']);
+    if(F.type==='biz'&&s.group==='temp')msgs.push(['w','ลูกจ้างชั่วคราว: ลากิจหักค่าจ้างตามจำนวนวันที่ลาจริง']);
+    if(F.type==='sick'&&s.group==='temp'&&monthsServed(s,a)<6)msgs.push(['w','ลูกจ้างชั่วคราวทำงานไม่ครบ 6 เดือน: ลาป่วยหักค่าจ้างตามระเบียบ']);
+    if(F.type==='sick'&&days>=3)msgs.push(['i','ลาป่วยตั้งแต่ 3 วันขึ้นไป ต้องแนบใบรับรองแพทย์']);
+    const ov=D.leaves.find(r=>r.sid===s.id&&r.id!==(ed&&ed.id)&&r.start<=b&&r.end>=a);
+    if(ov)msgs.push(['w',`ช่วงวันซ้อนกับรายการเดิม: ${T[ov.type].n} ${thd(ov.start)}${ov.end!==ov.start?' – '+thd(ov.end):''}`]);
+    $('#fq').innerHTML=`<div class="qbox"><div class="small" style="margin-bottom:8px"><b>${t.n}</b> · ปีงบ ${fy} · ${GROUPS[s.group]||''}</div>${sameFy?`<div class="nums"><div><span>สิทธิ์</span><b>${q??'–'}</b></div><div><span>ใช้ไปแล้ว</span><b>${fmt(u)}</b></div><div><span>ครั้งนี้</span><b style="color:var(--blue-d)">${fmt(days)}</b></div><div><span>คงเหลือ</span><b style="color:${q!=null&&q-u-days<0?'var(--danger)':'var(--ok)'}">${q!=null?fmt(q-u-days):'–'}</b></div></div>`:''}${msgs.map(m=>`<div class="alert ${m[0]}">${m[1]}</div>`).join('')}</div>`;
+  }
+  if(ed)$('#fd').value=ed.days;calc();
+  $('#fcancel').onclick=closeLayer;
+  $('#fsave').onclick=async()=>{
+    const a=$('#fa').value,b=$('#fb').value,days=parseFloat($('#fd').value)||0;
+    if(!F.sid){toast('กรุณาเลือกเจ้าหน้าที่',true);fs.focus();return}
+    if(!a||!b||b<a){toast('กรุณาตรวจสอบวันที่',true);return}
+    if(fyOf(a)!==fyOf(b)){toast('วันลาข้ามปีงบประมาณ กรุณาแยกรายการ',true);return}
+    if(days<=0){toast('จำนวนวันต้องมากกว่า 0',true);return}
+    const rec={id:ed?ed.id:'',sid:F.sid,type:F.type,start:a,end:b,days,half:$('#fh').value,doc:$('#fdoc').value.trim(),note:$('#fnote').value.trim()};
+    $('#fsave').disabled=true;
+    try{const r=await run('apiSaveLeave',TOKEN,rec);closeLayer();setData(r.data);render();toast(ed?'บันทึกการแก้ไขแล้ว':'บันทึกการลาเรียบร้อย');}
+    catch(e){const b2=$('#fsave');if(b2)b2.disabled=false;}
+  };
+  if(!F.sid)setTimeout(()=>fs.focus(),50);
+}
+
+/* ===================== render ===================== */
+async function reloadFy(fy){const r=await run('apiLoadFy',TOKEN,fy||S.fy);setData(r.data);S.hm='all';S.mm=null;render();}
+function render(){
+  renderNav();const v=$('#view');
+  if(S.view==='dash'){v.innerHTML=vDash();bindSid(v);}
+  if(S.view==='staff'){v.innerHTML=vStaff();$('#sort').value=S.sort;renderStaffList();
+    $('#q').oninput=e=>{S.q=e.target.value;renderStaffList()};$('#sort').onchange=e=>{S.sort=e.target.value;renderStaffList()};
+    v.querySelectorAll('[data-g]').forEach(b=>b.onclick=()=>{S.grp=b.dataset.g;v.querySelectorAll('[data-g]').forEach(x=>x.classList.toggle('on',x===b));renderStaffList()});
+    const a=$('#addStaff');if(a)a.onclick=()=>staffForm();}
+  if(S.view==='hist'){v.innerHTML=vHist();renderHist();
+    $('#hq').oninput=e=>{S.hq=e.target.value;renderHist()};$('#ht').onchange=e=>{S.ht=e.target.value;renderHist()};$('#hm').onchange=e=>{S.hm=e.target.value;renderHist()};}
+  if(S.view==='month'){v.innerHTML=vMonth();renderMonth();
+    $('#mm').onchange=e=>{S.mm=e.target.value;renderMonth()};$('#showAll').onchange=e=>{S.showAll=e.target.checked;renderMonth()};$('#copyT').onclick=copyMonth;}
+  if(S.view==='log'){v.innerHTML=vLog();renderLogs();if(!LOGS)loadLogs();
+    $('#lq').oninput=e=>{S.lq=e.target.value;renderLogs()};$('#la').onchange=renderLogs;$('#lref').onclick=loadLogs;}
+  if(S.view==='set'){v.innerHTML=vSet();
+    v.querySelectorAll('[data-q]').forEach(i=>i.onchange=async()=>{const[g,k,f]=i.dataset.q.split('|');try{await run('apiSaveQuota',TOKEN,g,k,f,i.value.trim());const q=D.quota[g]=D.quota[g]||{};q[k]=q[k]||{};q[k][f]=i.value.trim()===''?null:+i.value;_u=null;toast('บันทึกสิทธิ์ '+GROUPS[g]+' แล้ว');}catch(e){}});
+    v.querySelectorAll('[data-hdel]').forEach(b=>b.onclick=async()=>{try{const r=await run('apiHoliday',TOKEN,'del',b.dataset.hdel,'');D.holidays=r.holidays;render();}catch(e){}});
+    const ha=$('#hadd');if(ha)ha.onclick=async()=>{const d=$('#hd').value,n=$('#hn').value.trim();if(!d||!n){toast('ระบุวันที่และชื่อวันหยุด',true);return}try{const r=await run('apiHoliday',TOKEN,'add',d,n);D.holidays=r.holidays;render();toast('เพิ่มวันหยุดแล้ว');}catch(e){}};
+    if(isHR())loadAdmin();}
+  const bh=$('#bnHr');if(bh)bh.onclick=enterHr;
+}
+$('#fy').onchange=e=>reloadFy(e.target.value);
+$('#fab').onclick=()=>openForm();
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closeLayer()});
+start(LS.get('lv_hr')||LS.get('lv_view'));
+</script>
+</body>
+</html>
