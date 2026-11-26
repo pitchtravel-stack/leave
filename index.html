@@ -173,12 +173,12 @@ input:focus,select:focus,textarea:focus{outline:2px solid #B9D8F6;border-color:v
 <div class="loading hidden" id="loading"><div class="spin"></div></div>
 
 <script>
-const VERSION='1.4.0';
+const VERSION='1.5.0';
 /* ⚙️ ใส่ URL ของ web app (ลงท้าย /exec) จาก Deploy > Manage deployments */
-const API_URL='https://script.google.com/macros/s/AKfycbzveIFGQBSJZOOLpbqDo73utbT-GEmWZioqVbMg9smdyWQTPAwDR4wCnfQULpA_8zSz0A/exec';
+const API_URL='https://script.google.com/macros/s/AKfycbyYVv3F-lPG3QgLv4KUuG4ugyFawJwfMuODfJU2qb5mE5cdXOdtkhGT-eEoIpl0LQgJfg/exec';
 document.getElementById('lfoot').textContent='เวอร์ชัน '+VERSION;
 /* ===================== constants ===================== */
-const GROUPS={gov:'ข้าราชการ',perm:'ลูกจ้างประจำ',moph:'พกส./พนักงานราชการ',temp:'ลูกจ้างชั่วคราว'};
+const GROUPS={gov:'ข้าราชการ',perm:'ลูกจ้างประจำ',moph:'พกส.',pgr:'พนักงานราชการ',temp:'ลูกจ้างชั่วคราว'};
 const TYPES=[{k:'sick',n:'ลาป่วย',c:'var(--sick)',unit:'work'},{k:'biz',n:'ลากิจส่วนตัว',c:'var(--biz)',unit:'work'},{k:'vac',n:'ลาพักผ่อน',c:'var(--vac)',unit:'work'},{k:'mat',n:'ลาคลอดบุตร',c:'var(--mat)',unit:'cal'},{k:'pat',n:'ลาช่วยภริยาคลอด',c:'var(--pat)',unit:'work'},{k:'ord',n:'ลาอุปสมบท/ฮัจย์',c:'var(--ord)',unit:'cal'},{k:'oth',n:'ลาอื่น ๆ',c:'var(--oth)',unit:'work'}];
 const T=Object.fromEntries(TYPES.map(t=>[t.k,t]));
 const STATUS={active:'ปฏิบัติงาน',retired:'เกษียณ',resigned:'ลาออก/พ้นสภาพ'};
@@ -482,7 +482,7 @@ function vSet(){
    <div style="overflow:auto"><table class="tbl qt"><thead><tr><th>ประเภทบุคลากร</th>${keys.map(k=>`<th class="num">${T[k].n.replace('ลา','')}</th>`).join('')}<th class="num">ป่วย/กิจ ปีแรก</th><th class="num">สะสมพักผ่อนสูงสุด</th></tr></thead><tbody>
    ${Object.entries(GROUPS).map(([g,n])=>`<tr><td><b style="font-weight:600">${n}</b></td>${keys.map(k=>`<td class="num"><input data-q="${g}|${k}|days" value="${qv(g,k,'days')}" ${hr?'':'disabled'}></td>`).join('')}<td class="num small">${qv(g,'sick','first')!==''?'ป่วย '+qv(g,'sick','first'):''}${qv(g,'biz','first')!==''?'กิจ '+qv(g,'biz','first'):''}</td><td class="num"><input data-q="${g}|vac|max" value="${qv(g,'vac','max')}" ${hr?'':'disabled'}>${qv(g,'vac','max10')!==''?`<div class="small muted">≥10 ปี: ${qv(g,'vac','max10')}</div>`:''}</td></tr>`).join('')}
    </tbody></table></div>
-   <div class="small" style="margin-top:12px;line-height:1.8">• <b>ลาพักผ่อน</b> ต้องปฏิบัติงานครบ 6 เดือน · ข้าราชการ/ลูกจ้างประจำ สะสมรวมไม่เกิน 20 วัน (รับราชการ ≥ 10 ปี ไม่เกิน 30 วัน) · พกส./พนักงานราชการ สะสมได้ไม่เกิน 5 วัน/ปี · ลูกจ้างชั่วคราวไม่สะสม<br>• <b>ลาป่วย</b> พกส./ลูกจ้างชั่วคราว ทำงานไม่ครบ 1 ปีงบ มีสิทธิ์ 8 วัน · ลาป่วย 3 วันขึ้นไปต้องมีใบรับรองแพทย์<br>• <b>ลากิจ</b> ข้าราชการปีแรก 15 วันทำการ · ลูกจ้างชั่วคราวหักค่าจ้างตามจริง<br>• นับ <b>วันทำการ</b> ยกเว้นลาคลอด/อุปสมบทนับวันปฏิทิน</div></div>
+   <div class="small" style="margin-top:12px;line-height:1.8">• <b>ลาพักผ่อน</b> ต้องปฏิบัติงานครบ 6 เดือน · ข้าราชการ/ลูกจ้างประจำ สะสมรวมไม่เกิน 20 วัน (รับราชการ ≥ 10 ปี ไม่เกิน 30 วัน) · พกส. และพนักงานราชการ สะสมรวมไม่เกิน 15 วัน · ลูกจ้างชั่วคราวไม่สะสม<br>• <b>ลาป่วย</b> พกส./ลูกจ้างชั่วคราว ทำงานไม่ครบ 1 ปีงบ มีสิทธิ์ 8 วัน · พนักงานราชการ 30 วันทำการ/ปี · ลาป่วย 3 วันขึ้นไปต้องมีใบรับรองแพทย์<br>• <b>ลากิจ</b> ข้าราชการปีแรก 15 วันทำการ · พนักงานราชการ 10 วันทำการ/ปี · ลูกจ้างชั่วคราวหักค่าจ้างตามจริง<br>• <b>ลาอุปสมบท</b> พนักงานราชการต้องปฏิบัติงานติดต่อกันไม่น้อยกว่า 4 ปี<br>• นับ <b>วันทำการ</b> ยกเว้นลาคลอด/อุปสมบทนับวันปฏิทิน</div></div>
    <div class="grid" style="align-content:start">
     <div class="card pad"><h2>วันหยุดราชการ</h2><div style="max-height:260px;overflow:auto;font-size:13.5px">${D.holidays.map(h=>`<div style="display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--line2)"><span>${thd(h[0])} <span class="muted">${esc(h[1])}</span></span>${hr?`<button class="btn sm dan" data-hdel="${h[0]}">ลบ</button>`:''}</div>`).join('')||'<div class="muted">ยังไม่มีข้อมูล</div>'}</div>
      ${hr?`<div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap"><input type="date" id="hd" class="sel"><input id="hn" class="sel" placeholder="ชื่อวันหยุด" style="flex:1;min-width:120px"><button class="btn" id="hadd">เพิ่ม</button></div>`:''}</div>
@@ -636,6 +636,7 @@ function openForm({id,sid}={}){
     if(F.type==='vac'&&monthsServed(s,a)<6)msgs.push(['w','ปฏิบัติงานยังไม่ครบ 6 เดือน — ยังไม่มีสิทธิ์ลาพักผ่อนตามระเบียบ']);
     if(F.type==='biz'&&s.group==='temp')msgs.push(['w','ลูกจ้างชั่วคราว: ลากิจหักค่าจ้างตามจำนวนวันที่ลาจริง']);
     if(F.type==='sick'&&s.group==='temp'&&monthsServed(s,a)<6)msgs.push(['w','ลูกจ้างชั่วคราวทำงานไม่ครบ 6 เดือน: ลาป่วยหักค่าจ้างตามระเบียบ']);
+    if(F.type==='ord'&&s.group==='pgr'&&monthsServed(s,a)<48)msgs.push(['w','พนักงานราชการ: ลาอุปสมบทต้องปฏิบัติงานติดต่อกันไม่น้อยกว่า 4 ปี']);
     if(F.type==='sick'&&days>=3)msgs.push(['i','ลาป่วยตั้งแต่ 3 วันขึ้นไป ต้องแนบใบรับรองแพทย์']);
     const ov=D.leaves.find(r=>r.sid===s.id&&r.id!==(ed&&ed.id)&&r.start<=b&&r.end>=a);
     if(ov)msgs.push(['w',`ช่วงวันซ้อนกับรายการเดิม: ${T[ov.type].n} ${thd(ov.start)}${ov.end!==ov.start?' – '+thd(ov.end):''}`]);
