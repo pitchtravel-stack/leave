@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&display=swap">
 <style>
 :root{--blue:#1E7FD8;--blue-d:#145EA8;--blue-l:#E6F1FC;--blue-ll:#F2F8FE;--bg:#F3F5F8;--line:#E1E6ED;--line2:#EDF0F4;--text:#1E2A38;--muted:#667487;--muted2:#94A0B0;
---sick:#3E8EDE;--biz:#E0A030;--vac:#2FA37A;--mat:#D2669A;--pat:#7B6FD6;--ord:#8C7A5B;--oth:#8A96A6;--danger:#D64545;--ok:#2F855A;--r:12px;--shadow:0 1px 2px rgba(20,40,70,.06),0 2px 8px rgba(20,40,70,.05)}
+--sick:#3E8EDE;--biz:#E0A030;--vac:#2FA37A;--mat:#D2669A;--pat:#7B6FD6;--ord:#8C7A5B;--oth:#8A96A6;--duty:#0E8A9A;--danger:#D64545;--ok:#2F855A;--r:12px;--shadow:0 1px 2px rgba(20,40,70,.06),0 2px 8px rgba(20,40,70,.05)}
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--text);font-family:'Sarabun',system-ui,sans-serif;font-size:15px;line-height:1.5}
 button,input,select,textarea{font:inherit;color:inherit}
@@ -187,13 +187,15 @@ input:focus,select:focus,textarea:focus{outline:2px solid #B9D8F6;border-color:v
 <div class="loading hidden" id="loading"><div class="spin"></div></div>
 
 <script>
-const VERSION='1.7.2';
+const VERSION='1.8.0';
 /* ⚙️ ใส่ URL ของ web app (ลงท้าย /exec) จาก Deploy > Manage deployments */
 const API_URL='https://script.google.com/macros/s/AKfycbxTmqnlyvAXsr7m8faN-o7yGal6rtot9Jg2O-_WrsHbyO8fceo_54c368lItwiefOHMTw/exec';
 document.getElementById('lfoot').textContent='เวอร์ชัน '+VERSION;
 /* ===================== constants ===================== */
 const GROUPS={gov:'ข้าราชการ',perm:'ลูกจ้างประจำ',moph:'พกส.',pgr:'พนักงานราชการ',temp:'ลูกจ้างชั่วคราว'};
-const TYPES=[{k:'sick',n:'ลาป่วย',c:'var(--sick)',unit:'work'},{k:'biz',n:'ลากิจส่วนตัว',c:'var(--biz)',unit:'work'},{k:'vac',n:'ลาพักผ่อน',c:'var(--vac)',unit:'work'},{k:'mat',n:'ลาคลอดบุตร',c:'var(--mat)',unit:'cal'},{k:'pat',n:'ลาช่วยภริยาคลอด',c:'var(--pat)',unit:'work'},{k:'ord',n:'ลาอุปสมบท/ฮัจย์',c:'var(--ord)',unit:'cal'},{k:'oth',n:'ลาอื่น ๆ',c:'var(--oth)',unit:'work'}];
+const TYPES=[{k:'sick',n:'ลาป่วย',c:'var(--sick)',unit:'work'},{k:'biz',n:'ลากิจส่วนตัว',c:'var(--biz)',unit:'work'},{k:'vac',n:'ลาพักผ่อน',c:'var(--vac)',unit:'work'},{k:'mat',n:'ลาคลอดบุตร',c:'var(--mat)',unit:'cal'},{k:'pat',n:'ลาช่วยภริยาคลอด',c:'var(--pat)',unit:'work'},{k:'ord',n:'ลาอุปสมบท/ฮัจย์',c:'var(--ord)',unit:'cal'},{k:'oth',n:'ลาอื่น ๆ',c:'var(--oth)',unit:'work'},{k:'duty',n:'ไปราชการ',c:'var(--duty)',unit:'cal',nl:1}];
+/* v1.8.0 ไปราชการ: แสดงในปฏิทิน/ประวัติ แต่ไม่นับเป็นวันลา */
+const isLv=r=>!(T[r.type]&&T[r.type].nl);
 const T=Object.fromEntries(TYPES.map(t=>[t.k,t]));
 const STATUS={active:'ปฏิบัติงาน',retired:'เกษียณ',resigned:'ลาออก/พ้นสภาพ'};
 const LS={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}},del:k=>{try{localStorage.removeItem(k)}catch(e){}}};
@@ -268,7 +270,7 @@ function quota(s,type,fy){
 function monthsServed(s,at){if(!s.start)return 999;const a=d2(s.start),b=d2(at);return(b.getFullYear()-a.getFullYear())*12+(b.getMonth()-a.getMonth())-(b.getDate()<a.getDate()?1:0);}
 function usage(sid,excl){const u={};TYPES.forEach(t=>u[t.k]=0);D.leaves.forEach(r=>{if(r.sid===sid&&r.id!==excl)u[r.type]+=r.days});return u;}
 function allUsage(){if(_u)return _u;const m={};D.staff.forEach(s=>{m[s.id]={};TYPES.forEach(t=>m[s.id][t.k]=0)});D.leaves.forEach(r=>{if(m[r.sid])m[r.sid][r.type]+=r.days});return _u=m;}
-function mkSummary(L){const t=today,o={count:L.length,days:0,people:new Set(L.map(r=>r.sid)).size,today:0,todayIds:[],byM:{},byT:{}};
+function mkSummary(L){L=L.filter(isLv);const t=today,o={count:L.length,days:0,people:new Set(L.map(r=>r.sid)).size,today:0,todayIds:[],byM:{},byT:{}};
   L.forEach(r=>{const v=+r.days||0,m=r.start.slice(0,7);o.days+=v;if(r.start<=t&&r.end>=t){o.today++;o.todayIds.push(r.sid);}(o.byM[m]=o.byM[m]||{})[r.type]=(o.byM[m][r.type]||0)+v;o.byT[r.type]=(o.byT[r.type]||0)+v;});return o;}
 function setData(d){
   if(PRIV()){if(!d.summary)d.summary=mkSummary(d.leaves||[]);const me=String(USER.staffId||'');d.leaves=(d.leaves||[]).filter(r=>String(r.sid)===me);}
@@ -392,7 +394,7 @@ function myCard(){
 }
 function vDash(){
   const U=allUsage(),act=D.staff.filter(active),recs=D.leaves,P=PRIV(),SM=P&&D.summary?D.summary:mkSummary(recs),tot=SM.days;
-  const onLeave=P?[]:recs.filter(r=>r.start<=today&&r.end>=today);
+  const onLeave=P?[]:recs.filter(isLv).filter(r=>r.start<=today&&r.end>=today);
   const months=fyMonths(S.fy);
   const byM=months.map(m=>{const o={};TYPES.forEach(t=>o[t.k]=+((SM.byM[m]||{})[t.k]||0));return o});
   const maxM=Math.max(1,...byM.map(o=>Object.values(o).reduce((a,b)=>a+b,0)));
@@ -427,7 +429,7 @@ function vStaff(){
 function renderStaffList(){
   const U=allUsage(),q=S.q.trim().toLowerCase(),fy=S.fy;
   let L=D.staff.filter(mine).filter(s=>(S.grp==='inactive'?!active(s):active(s)&&(S.grp==='all'||s.group===S.grp))&&(!q||(s.name+' '+s.id+' '+s.dept+' '+s.position).toLowerCase().includes(q)));
-  const tot=s=>Object.values(U[s.id]).reduce((a,b)=>a+b,0);
+  const tot=s=>TYPES.filter(t=>!t.nl).reduce((a,t)=>a+U[s.id][t.k],0);
   if(S.sort==='vac')L=[...L].sort((a,b)=>((quota(a,'vac',fy)||0)-U[a.id].vac)-((quota(b,'vac',fy)||0)-U[b.id].vac));
   if(S.sort==='sick')L=[...L].sort((a,b)=>U[b.id].sick-U[a.id].sick);
   if(S.sort==='total')L=[...L].sort((a,b)=>tot(b)-tot(a));
@@ -473,7 +475,7 @@ function monthRows(){
   const m=S.mm,endM=m+'-31';
   return Object.keys(GROUPS).map(g=>({g,L:D.staff.filter(s=>s.group===g&&active(s)&&mine(s)).map(s=>{
     const o={biz:0,sick:0,mat:0,vac:0,oth:0};let vu=0;
-    D.leaves.forEach(r=>{if(r.sid!==s.id)return;if(r.start.slice(0,7)===m)o[['biz','sick','mat','vac'].includes(r.type)?r.type:'oth']+=r.days;if(r.type==='vac'&&r.start<=endM)vu+=r.days;});
+    D.leaves.forEach(r=>{if(r.sid!==s.id||!isLv(r))return;if(r.start.slice(0,7)===m)o[['biz','sick','mat','vac'].includes(r.type)?r.type:'oth']+=r.days;if(r.type==='vac'&&r.start<=endM)vu+=r.days;});
     return {s,o,rem:(quota(s,'vac',S.fy)||0)-vu,any:Object.values(o).some(v=>v>0)};}).filter(x=>S.showAll||x.any)}));
 }
 function renderMonth(){
@@ -497,7 +499,7 @@ function vCal(){
   return bannerHTML()+`<div class="tools"><button class="btn" id="cprev" aria-label="เดือนก่อน">‹</button><select class="sel" id="cm">${months.map(m=>`<option value="${m}" ${S.cm===m?'selected':''}>${mLong(m)}</option>`).join('')}</select><button class="btn" id="cnext" aria-label="เดือนถัดไป">›</button>
    <select class="sel" id="cg"><option value="all">ทุกประเภทบุคลากร</option>${Object.entries(GROUPS).map(([k,n])=>`<option value="${k}" ${S.cg===k?'selected':''}>${n}</option>`).join('')}</select>
    ${depts.length?`<select class="sel" id="cd"><option value="all">ทุกหน่วยงาน</option>${depts.map(d=>`<option ${S.cd===d?'selected':''}>${esc(d)}</option>`).join('')}</select>`:'<input type="hidden" id="cd" value="all">'}
-   <select class="sel" id="ct"><option value="all">ทุกประเภทการลา</option>${TYPES.map(t=>`<option value="${t.k}" ${S.ct===t.k?'selected':''}>${t.n}</option>`).join('')}</select>
+   <select class="sel" id="ct"><option value="all">ทุกประเภท (ลา/ไปราชการ)</option>${TYPES.map(t=>`<option value="${t.k}" ${S.ct===t.k?'selected':''}>${t.n}</option>`).join('')}</select>
    <div class="search">${ico('search')}<input id="cq" placeholder="ค้นหาชื่อ…" value="${esc(S.cq)}" autocomplete="off"></div></div>
    <div class="grid kpis" id="ckpi" style="margin-bottom:14px"></div>
    <div class="card pad"><div class="cal" id="cgrid"></div><div class="legend" style="margin-top:10px">${TYPES.map(t=>`<span><span class="dot" style="background:${t.c}"></span>${t.n}</span>`).join('')}</div>
@@ -520,9 +522,9 @@ function renderCal(){
   const m=S.cm,M=calMap(m),[y,mo]=m.split('-').map(Number),first=new Date(y,mo-1,1),nd=new Date(y,mo,0).getDate();
   const holN=Object.fromEntries(D.holidays.map(h=>[h[0],h[1]]));
   const ppl=new Set(),byT={};let tot=0,peak=['',0];
-  Object.entries(M).forEach(([iso,L])=>{L.forEach(x=>{ppl.add(x.s.id);tot+=x.r.half?0.5:1;byT[x.r.type]=(byT[x.r.type]||0)+1});if(L.length>peak[1])peak=[iso,L.length]});
-  const tl=M[today]||[];
-  $('#ckpi').innerHTML=`<div class="card pad kpi"><div class="l">ลาวันนี้</div><div class="v">${today.slice(0,7)===m?tl.length:'–'} <small>คน</small></div><div class="s">${today.slice(0,7)===m?(tl.slice(0,3).map(x=>esc(plain(x.s.name))).join(', ')||'—'):'ไม่ใช่เดือนปัจจุบัน'}</div></div>
+  Object.entries(M).forEach(([iso,L0])=>{const L=L0.filter(x=>isLv(x.r));L.forEach(x=>{ppl.add(x.s.id);tot+=x.r.half?0.5:1;byT[x.r.type]=(byT[x.r.type]||0)+1});if(L.length>peak[1])peak=[iso,L.length]});
+  const tl=(M[today]||[]).filter(x=>isLv(x.r)),td=(M[today]||[]).filter(x=>!isLv(x.r));
+  $('#ckpi').innerHTML=`<div class="card pad kpi"><div class="l">ลาวันนี้</div><div class="v">${today.slice(0,7)===m?tl.length:'–'} <small>คน</small></div><div class="s">${today.slice(0,7)===m?(tl.slice(0,3).map(x=>esc(plain(x.s.name))).join(', ')||'—'):'ไม่ใช่เดือนปัจจุบัน'}${today.slice(0,7)===m&&td.length?` · ไปราชการ ${td.length} คน`:''}</div></div>
    <div class="card pad kpi"><div class="l">ผู้ลาในเดือน</div><div class="v">${ppl.size} <small>คน</small></div><div class="s">${mLong(m)}</div></div>
    <div class="card pad kpi"><div class="l">วันลารวม (คน-วัน)</div><div class="v">${fmt(tot)}</div><div class="s">${TYPES.filter(t=>byT[t.k]).map(t=>t.n.replace('ลา','').replace('ส่วนตัว','')+' '+byT[t.k]).join(' · ')||'—'}</div></div>
    <div class="card pad kpi"><div class="l">วันที่ลามากที่สุด</div><div class="v">${peak[1]} <small>คน</small></div><div class="s">${peak[0]?thd(peak[0]):'—'}</div></div>`;
@@ -686,7 +688,7 @@ function openForm({id,sid}={}){
   const F={sid:ed?ed.sid:(sid||''),type:ed?ed.type:'sick',manual:!!ed};
   modal(ed?'แก้ไขรายการลา':'บันทึกการลา',`
    <div class="f"><label>เจ้าหน้าที่ *</label><div class="combo"><input id="fs" placeholder="พิมพ์ชื่อเพื่อค้นหา…" autocomplete="off" value="${F.sid?esc(SBY[F.sid].name):''}"><div class="opts hidden" id="fopts"></div></div></div>
-   <div class="f"><label>ประเภทการลา *</label><div class="typegrid" id="ftype">${TYPES.map(t=>`<button type="button" class="tbtn ${F.type===t.k?'on':''}" data-t="${t.k}"><span class="dot" style="background:${t.c}"></span>${t.n}</button>`).join('')}</div></div>
+   <div class="f"><label>ประเภท (การลา / ไปราชการ) *</label><div class="typegrid" id="ftype">${TYPES.map(t=>`<button type="button" class="tbtn ${F.type===t.k?'on':''}" data-t="${t.k}"><span class="dot" style="background:${t.c}"></span>${t.n}</button>`).join('')}</div></div>
    <div class="row2"><div class="f"><label>ตั้งแต่วันที่ *</label><input type="date" id="fa" value="${ed?ed.start:today}"></div><div class="f"><label>ถึงวันที่ *</label><input type="date" id="fb" value="${ed?ed.end:today}"></div></div>
    <div class="row2"><div class="f"><label>ช่วงเวลา</label><select id="fh"><option value="">เต็มวัน</option><option value="ครึ่งเช้า">ครึ่งวันเช้า</option><option value="ครึ่งบ่าย">ครึ่งวันบ่าย</option></select></div>
    <div class="f"><label>จำนวนวันลา <span class="muted" style="font-weight:400" id="funit"></span></label><input type="number" step="0.5" min="0" id="fd"></div></div>
