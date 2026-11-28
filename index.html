@@ -187,7 +187,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #B9D8F6;border-color:v
 <div class="loading hidden" id="loading"><div class="spin"></div></div>
 
 <script>
-const VERSION='1.6.0';
+const VERSION='1.7.1';
 /* ⚙️ ใส่ URL ของ web app (ลงท้าย /exec) จาก Deploy > Manage deployments */
 const API_URL='https://script.google.com/macros/s/AKfycbxTmqnlyvAXsr7m8faN-o7yGal6rtot9Jg2O-_WrsHbyO8fceo_54c368lItwiefOHMTw/exec';
 document.getElementById('lfoot').textContent='เวอร์ชัน '+VERSION;
@@ -220,6 +220,9 @@ const plain=n=>String(n).replace(/^(นางสาว|น\.ส\.|นาง|น�
 const isHR=()=>USER&&USER.role==='hr';
 const isExec=()=>USER&&USER.role==='exec';
 const canCal=()=>isHR()||isExec();
+/* v1.7.0 โหมดส่วนตัว: เจ้าหน้าที่ทั่วไปเห็นเฉพาะการลาของตนเอง (ภาพรวมใช้ยอดสรุปจาก server) */
+const PRIV=()=>!!USER&&!canCal();
+const mine=s=>!PRIV()||String(s.id)===String(USER.staffId);
 const pinAcct=()=>USER&&(USER.isHrAccount||USER.isExecAccount);
 const active=s=>!/retired|resigned|เกษียณ|ลาออก/i.test(s.status||'');
 const tag=k=>`<span class="tag" style="background:color-mix(in srgb, ${T[k].c} 15%, white);color:color-mix(in srgb, ${T[k].c} 80%, black)">${T[k].n}</span>`;
@@ -265,7 +268,12 @@ function quota(s,type,fy){
 function monthsServed(s,at){if(!s.start)return 999;const a=d2(s.start),b=d2(at);return(b.getFullYear()-a.getFullYear())*12+(b.getMonth()-a.getMonth())-(b.getDate()<a.getDate()?1:0);}
 function usage(sid,excl){const u={};TYPES.forEach(t=>u[t.k]=0);D.leaves.forEach(r=>{if(r.sid===sid&&r.id!==excl)u[r.type]+=r.days});return u;}
 function allUsage(){if(_u)return _u;const m={};D.staff.forEach(s=>{m[s.id]={};TYPES.forEach(t=>m[s.id][t.k]=0)});D.leaves.forEach(r=>{if(m[r.sid])m[r.sid][r.type]+=r.days});return _u=m;}
-function setData(d){D=d;S.fy=d.fy;SBY=Object.fromEntries(d.staff.map(s=>[s.id,s]));_u=null;
+function mkSummary(L){const t=today,o={count:L.length,days:0,people:new Set(L.map(r=>r.sid)).size,today:0,todayIds:[],byM:{},byT:{}};
+  L.forEach(r=>{const v=+r.days||0,m=r.start.slice(0,7);o.days+=v;if(r.start<=t&&r.end>=t){o.today++;o.todayIds.push(r.sid);}(o.byM[m]=o.byM[m]||{})[r.type]=(o.byM[m][r.type]||0)+v;o.byT[r.type]=(o.byT[r.type]||0)+v;});return o;}
+function setData(d){
+  if(PRIV()){if(!d.summary)d.summary=mkSummary(d.leaves||[]);const me=String(USER.staffId||'');d.leaves=(d.leaves||[]).filter(r=>String(r.sid)===me);}
+  else d.summary=null;
+  D=d;S.fy=d.fy;SBY=Object.fromEntries(d.staff.map(s=>[s.id,s]));_u=null;
   $('#fy').innerHTML=d.fyList.map(f=>`<option value="${f}" ${f===d.fy?'selected':''}>ปีงบประมาณ ${f}</option>`).join('');
   $('#fy').disabled=d.fyList.length<2;$('#fy').title=d.restricted?'ข้อมูลปีงบก่อนหน้า กรุณาติดต่องานการเจ้าหน้าที่ (HR)':'';}
 
@@ -375,7 +383,7 @@ function bannerHTML(){
   if(isHR())return '';
   const old=D&&D.restricted?' · ข้อมูลปีงบก่อนหน้า กรุณาติดต่องานการเจ้าหน้าที่ (HR)':'';
   if(isExec())return `<div class="banner">👔 โหมดผู้บริหาร/หัวหน้างาน (ดูอย่างเดียว) · ปีงบประมาณ ${S.fy}${old}</div>`;
-  return `<div class="banner">👁️ โหมดดูอย่างเดียว · ปีงบประมาณ ${S.fy}${old} — หากข้อมูลไม่ถูกต้องโปรดติดต่องานการเจ้าหน้าที่${USER.isHrAccount?' <button class="btn sm" id="bnHr">เข้าโหมด HR</button>':USER.isExecAccount?' <button class="btn sm" id="bnHr">เข้าโหมดผู้บริหาร</button>':''}</div>`;
+  return `<div class="banner">👁️ โหมดดูอย่างเดียว · 🔒 แสดงเฉพาะข้อมูลการลาของท่าน · ปีงบประมาณ ${S.fy}${old} — หากข้อมูลไม่ถูกต้องโปรดติดต่องานการเจ้าหน้าที่${USER.isHrAccount?' <button class="btn sm" id="bnHr">เข้าโหมด HR</button>':USER.isExecAccount?' <button class="btn sm" id="bnHr">เข้าโหมดผู้บริหาร</button>':''}</div>`;
 }
 function myCard(){
   const s=SBY[USER.staffId];if(!s)return '';const u=usage(s.id);
@@ -383,20 +391,20 @@ function myCard(){
    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-top:10px">${['vac','sick','biz'].map(k=>{const q=quota(s,k,S.fy);return `<div><div class="small muted">${T[k].n}</div><b style="font-size:20px">${q!=null?fmt(q-u[k]):'–'}</b> <span class="small muted">คงเหลือ${q!=null?' จาก '+fmt(q):''}</span></div>`}).join('')}</div></div>`;
 }
 function vDash(){
-  const U=allUsage(),act=D.staff.filter(active),recs=D.leaves,tot=recs.reduce((a,r)=>a+r.days,0);
-  const onLeave=recs.filter(r=>r.start<=today&&r.end>=today);
+  const U=allUsage(),act=D.staff.filter(active),recs=D.leaves,P=PRIV(),SM=P&&D.summary?D.summary:mkSummary(recs),tot=SM.days;
+  const onLeave=P?[]:recs.filter(r=>r.start<=today&&r.end>=today);
   const months=fyMonths(S.fy);
-  const byM=months.map(m=>{const o={};TYPES.forEach(t=>o[t.k]=0);recs.forEach(r=>{if(r.start.slice(0,7)===m)o[r.type]+=r.days});return o});
+  const byM=months.map(m=>{const o={};TYPES.forEach(t=>o[t.k]=+((SM.byM[m]||{})[t.k]||0));return o});
   const maxM=Math.max(1,...byM.map(o=>Object.values(o).reduce((a,b)=>a+b,0)));
-  const byT=TYPES.map(t=>({t,v:recs.filter(r=>r.type===t.k).reduce((a,r)=>a+r.days,0)})).filter(x=>x.v>0);
-  const risk=[];act.forEach(s=>['sick','biz'].forEach(k=>{const q=quota(s,k,S.fy),u=U[s.id][k];if(q&&u>=q*0.7)risk.push({s,k,u,q,p:u/q})}));risk.sort((a,b)=>b.p-a.p);
+  const byT=TYPES.map(t=>({t,v:+(SM.byT[t.k]||0)})).filter(x=>x.v>0);
+  const risk=[];act.filter(mine).forEach(s=>['sick','biz'].forEach(k=>{const q=quota(s,k,S.fy),u=U[s.id][k];if(q&&u>=q*0.7)risk.push({s,k,u,q,p:u/q})}));risk.sort((a,b)=>b.p-a.p);
   const recent=[...recs].sort((a,b)=>(b.at||'').localeCompare(a.at||'')||b.start.localeCompare(a.start)).slice(0,6);
   const st=STATS||{};
   return bannerHTML()+myCard()+`
   <div class="grid kpis">
    <div class="card pad kpi"><div class="l">เจ้าหน้าที่ปฏิบัติงาน</div><div class="v">${act.length} <small>คน</small></div><div class="s">${Object.entries(GROUPS).map(([k,n])=>n.split('/')[0]+' '+act.filter(s=>s.group===k).length).join(' · ')}</div></div>
-   <div class="card pad kpi"><div class="l">การลา ปีงบ ${S.fy}</div><div class="v">${recs.length.toLocaleString()} <small>ครั้ง</small></div><div class="s">รวม ${fmt(tot)} วัน · ${new Set(recs.map(r=>r.sid)).size} คน</div></div>
-   <div class="card pad kpi"><div class="l">ลาวันนี้ (${thd(today)})</div><div class="v">${onLeave.length} <small>คน</small></div><div class="s">${onLeave.slice(0,3).map(r=>esc(plain((SBY[r.sid]||{}).name||''))).join(', ')||'—'}</div></div>
+   <div class="card pad kpi"><div class="l">การลา ปีงบ ${S.fy}</div><div class="v">${SM.count.toLocaleString()} <small>ครั้ง</small></div><div class="s">รวม ${fmt(tot)} วัน · ${SM.people} คน</div></div>
+   <div class="card pad kpi"><div class="l">ลาวันนี้ (${thd(today)})</div><div class="v">${P?SM.today:onLeave.length} <small>คน</small></div><div class="s">${(P?(SM.todayIds||[]):onLeave.map(r=>r.sid)).slice(0,3).map(id=>esc(plain((SBY[id]||{}).name||''))).join(', ')||'—'}</div></div>
    <div class="card pad kpi"><div class="l">👁 ผู้เข้าชมวันนี้</div><div class="v">${(st.today||0).toLocaleString()} <small>ครั้ง · ${st.todayUsers||0} คน</small></div><div class="s">เดือนนี้ ${(st.month||0).toLocaleString()} ครั้ง · ทั้งหมด ${(st.total||0).toLocaleString()} ครั้ง</div></div>
   </div>
   <div class="grid two" style="margin-top:14px">
@@ -406,8 +414,8 @@ function vDash(){
    <div class="card pad"><h2>สัดส่วนตามประเภทการลา</h2>${byT.length?byT.map(x=>`<div style="margin-bottom:11px"><div style="display:flex;justify-content:space-between;font-size:14px"><span><span class="dot" style="background:${x.t.c}"></span>${x.t.n}</span><b>${fmt(x.v)} วัน</b></div><div class="bar" style="margin-top:4px"><i style="width:${x.v/tot*100}%;background:${x.t.c}"></i></div></div>`).join(''):'<div class="empty">ยังไม่มีข้อมูลการลาในปีงบนี้</div>'}</div>
   </div>
   <div class="grid two" style="margin-top:14px">
-   <div class="card pad"><h2>บันทึกล่าสุด</h2><div class="list">${recent.map(r=>{const s=SBY[r.sid]||{name:r.sid};return `<div class="it" data-sid="${r.sid}"><div class="av">${esc(initials(s.name))}</div><div style="flex:1;min-width:0"><b>${esc(s.name)}</b><div class="small muted">${thd(r.start)}${r.end!==r.start?' – '+thd(r.end):''} · ${fmt(r.days)} วัน</div></div>${tag(r.type)}</div>`}).join('')||'<div class="empty">—</div>'}</div></div>
-   <div class="card pad"><h2>ใช้สิทธิ์ลาป่วย/ลากิจ ≥ 70%</h2><div class="list">${risk.slice(0,6).map(x=>`<div class="it" data-sid="${x.s.id}"><div class="av">${esc(initials(x.s.name))}</div><div style="flex:1;min-width:0"><b>${esc(x.s.name)}</b><div class="bar" style="margin-top:5px"><i style="width:${Math.min(100,x.p*100)}%;background:${x.p>=1?'var(--danger)':T[x.k].c}"></i></div></div><div class="small" style="text-align:right">${T[x.k].n}<br><b>${fmt(x.u)}/${x.q}</b></div></div>`).join('')||'<div class="empty">ไม่มีผู้ที่ใช้สิทธิ์ใกล้ครบ</div>'}</div></div>
+   <div class="card pad"><h2>${P?'การลาล่าสุดของฉัน':'บันทึกล่าสุด'}</h2><div class="list">${recent.map(r=>{const s=SBY[r.sid]||{name:r.sid};return `<div class="it" data-sid="${r.sid}"><div class="av">${esc(initials(s.name))}</div><div style="flex:1;min-width:0"><b>${esc(s.name)}</b><div class="small muted">${thd(r.start)}${r.end!==r.start?' – '+thd(r.end):''} · ${fmt(r.days)} วัน</div></div>${tag(r.type)}</div>`}).join('')||'<div class="empty">—</div>'}</div></div>
+   <div class="card pad"><h2>${P?'สิทธิ์ลาป่วย/ลากิจของฉัน ≥ 70%':'ใช้สิทธิ์ลาป่วย/ลากิจ ≥ 70%'}</h2><div class="list">${risk.slice(0,6).map(x=>`<div class="it" data-sid="${x.s.id}"><div class="av">${esc(initials(x.s.name))}</div><div style="flex:1;min-width:0"><b>${esc(x.s.name)}</b><div class="bar" style="margin-top:5px"><i style="width:${Math.min(100,x.p*100)}%;background:${x.p>=1?'var(--danger)':T[x.k].c}"></i></div></div><div class="small" style="text-align:right">${T[x.k].n}<br><b>${fmt(x.u)}/${x.q}</b></div></div>`).join('')||'<div class="empty">ไม่มีผู้ที่ใช้สิทธิ์ใกล้ครบ</div>'}</div></div>
   </div>`;
 }
 function vStaff(){
@@ -418,7 +426,7 @@ function vStaff(){
 }
 function renderStaffList(){
   const U=allUsage(),q=S.q.trim().toLowerCase(),fy=S.fy;
-  let L=D.staff.filter(s=>(S.grp==='inactive'?!active(s):active(s)&&(S.grp==='all'||s.group===S.grp))&&(!q||(s.name+' '+s.id+' '+s.dept+' '+s.position).toLowerCase().includes(q)));
+  let L=D.staff.filter(mine).filter(s=>(S.grp==='inactive'?!active(s):active(s)&&(S.grp==='all'||s.group===S.grp))&&(!q||(s.name+' '+s.id+' '+s.dept+' '+s.position).toLowerCase().includes(q)));
   const tot=s=>Object.values(U[s.id]).reduce((a,b)=>a+b,0);
   if(S.sort==='vac')L=[...L].sort((a,b)=>((quota(a,'vac',fy)||0)-U[a.id].vac)-((quota(b,'vac',fy)||0)-U[b.id].vac));
   if(S.sort==='sick')L=[...L].sort((a,b)=>U[b.id].sick-U[a.id].sick);
@@ -463,7 +471,7 @@ function vMonth(){
 }
 function monthRows(){
   const m=S.mm,endM=m+'-31';
-  return Object.keys(GROUPS).map(g=>({g,L:D.staff.filter(s=>s.group===g&&active(s)).map(s=>{
+  return Object.keys(GROUPS).map(g=>({g,L:D.staff.filter(s=>s.group===g&&active(s)&&mine(s)).map(s=>{
     const o={biz:0,sick:0,mat:0,vac:0,oth:0};let vu=0;
     D.leaves.forEach(r=>{if(r.sid!==s.id)return;if(r.start.slice(0,7)===m)o[['biz','sick','mat','vac'].includes(r.type)?r.type:'oth']+=r.days;if(r.type==='vac'&&r.start<=endM)vu+=r.days;});
     return {s,o,rem:(quota(s,'vac',S.fy)||0)-vu,any:Object.values(o).some(v=>v>0)};}).filter(x=>S.showAll||x.any)}));
