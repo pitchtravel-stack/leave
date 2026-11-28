@@ -187,7 +187,7 @@ input:focus,select:focus,textarea:focus{outline:2px solid #B9D8F6;border-color:v
 <div class="loading hidden" id="loading"><div class="spin"></div></div>
 
 <script>
-const VERSION='1.7.1';
+const VERSION='1.7.2';
 /* ⚙️ ใส่ URL ของ web app (ลงท้าย /exec) จาก Deploy > Manage deployments */
 const API_URL='https://script.google.com/macros/s/AKfycbxTmqnlyvAXsr7m8faN-o7yGal6rtot9Jg2O-_WrsHbyO8fceo_54c368lItwiefOHMTw/exec';
 document.getElementById('lfoot').textContent='เวอร์ชัน '+VERSION;
@@ -386,7 +386,7 @@ function bannerHTML(){
   return `<div class="banner">👁️ โหมดดูอย่างเดียว · 🔒 แสดงเฉพาะข้อมูลการลาของท่าน · ปีงบประมาณ ${S.fy}${old} — หากข้อมูลไม่ถูกต้องโปรดติดต่องานการเจ้าหน้าที่${USER.isHrAccount?' <button class="btn sm" id="bnHr">เข้าโหมด HR</button>':USER.isExecAccount?' <button class="btn sm" id="bnHr">เข้าโหมดผู้บริหาร</button>':''}</div>`;
 }
 function myCard(){
-  const s=SBY[USER.staffId];if(!s)return '';const u=usage(s.id);
+  const s=SBY[USER.staffId];if(!s)return PRIV()?`<div class="alert e" style="margin-bottom:14px">⚠️ Gmail <b>${esc(USER.email)}</b> ยังไม่ได้ผูกกับรายชื่อเจ้าหน้าที่ในระบบ จึงไม่พบข้อมูลการลาของท่าน — กรุณาแจ้งงานการเจ้าหน้าที่ (HR) ให้ใส่ Gmail นี้ในข้อมูลเจ้าหน้าที่</div>`:'';const u=usage(s.id);
   return `<div class="card pad" style="margin-bottom:14px;border-color:#C9DFF6;background:linear-gradient(180deg,#F2F8FE,#fff)"><div style="display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center"><div><div class="small muted">สิทธิ์การลาของฉัน · ปีงบ ${S.fy}</div><b style="font-size:16px">${esc(s.name)}</b></div><button class="btn sm" data-sid="${s.id}">ดูประวัติของฉัน</button></div>
    <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(130px,1fr));margin-top:10px">${['vac','sick','biz'].map(k=>{const q=quota(s,k,S.fy);return `<div><div class="small muted">${T[k].n}</div><b style="font-size:20px">${q!=null?fmt(q-u[k]):'–'}</b> <span class="small muted">คงเหลือ${q!=null?' จาก '+fmt(q):''}</span></div>`}).join('')}</div></div>`;
 }
